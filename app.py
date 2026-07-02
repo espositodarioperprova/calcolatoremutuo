@@ -83,6 +83,16 @@ dash_app.layout = dbc.Container(
                 dbc.Col(html.Div(build_tabs(), className="tabs-wrapper"), lg=9),
             ]
         ),
+        html.Footer(
+            html.Small([
+                "© 2025 ",
+                html.Strong("Dario Esposito"),
+                " · Calcolatore Mutuo per Rendita · Tutti i diritti riservati",
+            ]),
+            className="text-center text-muted py-3 mt-2",
+            style={"borderTop": "1px solid #e2e8f0", "fontSize": "0.72rem",
+                   "letterSpacing": "0.03em"},
+        ),
     ],
     fluid=True,
     className="px-4",
