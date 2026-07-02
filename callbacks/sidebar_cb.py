@@ -85,3 +85,13 @@ def register_sidebar_callbacks(app) -> None:
     )
     def disable_kiron(on):
         return not bool(on)
+
+    # ── Enable canone-growth inputs when switch is on ──────────────────────
+    @app.callback(
+        Output("canone-growth-pct",  "disabled"),
+        Output("canone-step-years",  "disabled"),
+        Input("canone-disallacciato", "value"),
+    )
+    def toggle_canone_params(disallacciato):
+        disabled = not bool(disallacciato)
+        return disabled, disabled

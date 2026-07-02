@@ -6,7 +6,7 @@ from dash import html
 
 
 def build_tabs() -> dbc.Tabs:
-    """Return the dbc.Tabs component with all five analysis tabs."""
+    """Return the dbc.Tabs component with all six analysis tabs."""
     return dbc.Tabs(
         [
             dbc.Tab(
@@ -24,7 +24,7 @@ def build_tabs() -> dbc.Tabs:
                 label="💡 Cosa Posso Permettermi?",
                 tab_id="tab-inverse",
                 children=html.Div([
-                    # Static spotlight config — always in DOM, survives sidebar changes
+                    # Static spotlight config — always in DOM
                     dbc.Card([
                         dbc.CardHeader(
                             html.H6(
@@ -77,6 +77,71 @@ def build_tabs() -> dbc.Tabs:
                 tab_id="tab-sensitivity",
                 children=html.Div(
                     id="tab-sensitivity-content", className="pt-3"),
+            ),
+            dbc.Tab(
+                label="📐 Estinzione Anticipata",
+                tab_id="tab-estinzione",
+                children=html.Div([
+                    # Static inputs — always in DOM, survive sidebar changes
+                    dbc.Card([
+                        dbc.CardHeader(
+                            html.H6(
+                                [html.I(className="bi bi-calculator me-2"),
+                                 "Parametri estinzione anticipata"],
+                                className="mb-0 fw-bold",
+                            ),
+                        ),
+                        dbc.CardBody([
+                            dbc.Row([
+                                dbc.Col([
+                                    dbc.Label("Anno di estinzione",
+                                              className="small fw-semibold"),
+                                    dbc.InputGroup([
+                                        dbc.Input(
+                                            id="anno-estinzione",
+                                            type="number",
+                                            value=None,
+                                            placeholder="es. 10",
+                                            min=1, max=39, step=1,
+                                        ),
+                                        dbc.InputGroupText("anni"),
+                                    ]),
+                                    dbc.FormText("Anno in cui estingui il mutuo residuo"),
+                                ], xs=12, sm=4),
+                                dbc.Col([
+                                    dbc.Label("Rendimento investimento alternativo",
+                                              className="small fw-semibold"),
+                                    dbc.InputGroup([
+                                        dbc.Input(
+                                            id="r-alt",
+                                            type="number",
+                                            value=5.0,
+                                            min=0, max=20, step=0.1,
+                                        ),
+                                        dbc.InputGroupText("%"),
+                                    ]),
+                                    dbc.FormText(
+                                        "Tasso che otterresti investendo il saldo residuo altrove"
+                                    ),
+                                ], xs=12, sm=4),
+                                dbc.Col([
+                                    dbc.Label("Detraibilità interessi",
+                                              className="small fw-semibold"),
+                                    dbc.Switch(
+                                        id="applica-detraibilita",
+                                        label="Applica 19% detraibilità (prima casa)",
+                                        value=True,
+                                        className="mt-1",
+                                    ),
+                                    dbc.FormText(
+                                        "Riduce il tasso effettivo del mutuo (max €4 000/anno)"
+                                    ),
+                                ], xs=12, sm=4),
+                            ]),
+                        ]),
+                    ], className="mt-3 mb-0 shadow-sm"),
+                    html.Div(id="tab-estinzione-content"),
+                ]),
             ),
         ],
         id="main-tabs",

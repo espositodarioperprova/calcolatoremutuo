@@ -5,6 +5,7 @@ from .inverse import register_inverse
 from .rent import register_rent
 from .amort import register_amort
 from .sensitivity import register_sensitivity
+from .estinzione import register_estinzione
 
 
 def register_all_callbacks(app) -> None:
@@ -15,3 +16,4 @@ def register_all_callbacks(app) -> None:
     register_rent(app)
     register_amort(app)
     register_sensitivity(app)
+    register_estinzione(app)
