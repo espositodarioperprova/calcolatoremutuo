@@ -60,7 +60,7 @@ def build_costs(
         "Assicurazione vita": ass_vita,
         "Imposta di registro": imp_reg,
         "Provvigione agenzia immobiliare": quota_med,
-        "Notaio": notaio,
+        "Oneri notaio per l'acquisto": notaio,
         "Costo atti donazione": donaz,
     }
     items["TOTALE INIZIALE"] = sum(items.values())

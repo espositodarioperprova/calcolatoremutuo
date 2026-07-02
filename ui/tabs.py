@@ -12,7 +12,8 @@ def build_tabs() -> dbc.Tabs:
             dbc.Tab(
                 label="📊 Overview sul Mutuo",
                 tab_id="tab-risultati",
-                children=html.Div(id="tab-risultati-content", className="pt-3"),
+                children=html.Div(id="tab-risultati-content",
+                                  className="pt-3"),
             ),
             dbc.Tab(
                 label="📈 Valutazione Investimento",
@@ -27,14 +28,16 @@ def build_tabs() -> dbc.Tabs:
                     dbc.Card([
                         dbc.CardHeader(
                             html.H6(
-                                [html.I(className="bi bi-sliders me-2"), "Budget di riferimento personalizzabile"],
+                                [html.I(className="bi bi-sliders me-2"),
+                                 "Budget di riferimento personalizzabile"],
                                 className="mb-0 fw-bold",
                             ),
                         ),
                         dbc.CardBody([
                             dbc.Row([
                                 dbc.Col([
-                                    dbc.Label("Budget cash disponibile (€)", className="small fw-semibold"),
+                                    dbc.Label("Budget cash disponibile (€)",
+                                              className="small fw-semibold"),
                                     dbc.Input(
                                         id="spotlight-budget",
                                         type="number",
@@ -44,7 +47,8 @@ def build_tabs() -> dbc.Tabs:
                                     ),
                                 ], xs=12, sm=6),
                                 dbc.Col([
-                                    dbc.Label("% Anticipo di riferimento", className="small fw-semibold"),
+                                    dbc.Label("% Anticipo di riferimento",
+                                              className="small fw-semibold"),
                                     dbc.InputGroup([
                                         dbc.Input(
                                             id="spotlight-pct-ref",
@@ -71,7 +75,8 @@ def build_tabs() -> dbc.Tabs:
             dbc.Tab(
                 label="🔍 Analisi di Sensibilità",
                 tab_id="tab-sensitivity",
-                children=html.Div(id="tab-sensitivity-content", className="pt-3"),
+                children=html.Div(
+                    id="tab-sensitivity-content", className="pt-3"),
             ),
         ],
         id="main-tabs",

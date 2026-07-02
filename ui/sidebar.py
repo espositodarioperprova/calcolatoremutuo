@@ -63,7 +63,7 @@ def build_sidebar() -> dbc.Card:
                     id="tipo",
                     options=[
                         {"label": "Prima casa", "value": "prima"},
-                        {"label": "Prima casa + donazione nella provenienza",
+                        {"label": "1a casa (se prima dono l'altra)",
                          "value": "prima_donaz"},
                         {"label": "Seconda casa / Non prima casa",
                          "value": "seconda"},
@@ -73,7 +73,8 @@ def build_sidebar() -> dbc.Card:
                 ),
                 html.Hr(className="my-2"),
 
-                dbc.Label("Rendita catastale base (€)", className="fw-semibold"),
+                dbc.Label("Rendita catastale base (€)",
+                          className="fw-semibold"),
                 dbc.Input(
                     id="rendita", type="number",
                     value=206.58, min=0, step=0.01, className="mb-1",
@@ -89,28 +90,52 @@ def build_sidebar() -> dbc.Card:
                 ),
 
                 dbc.Button(
-                    [html.I(className="bi bi-sliders me-1"), "Costi personalizzati"],
+                    [html.I(className="bi bi-sliders me-1"),
+                     "Costi personalizzati"],
                     id="adv-toggle", color="light", size="sm",
                     className="w-100 mb-2",
                 ),
                 dbc.Collapse(
                     dbc.Card(dbc.CardBody([
-                        dbc.Label("Notaio (€)"),
+                        dbc.Label("Oneri notaio per l'acquisto (€)"),
                         dbc.Input(id="notaio", type="number",
                                   value=2000, min=0, className="mb-2"),
                         dbc.Label("Perizia immobile (€)"),
                         dbc.Input(id="perizia-val", type="number",
                                   value=350, min=0, className="mb-2"),
-                        dbc.Label("Assicurazione incendio (€)"),
+                        # ── Optional costs with enable switches ───────────
+                        dbc.Row([
+                            dbc.Col(dbc.Label("Assicurazione incendio (€)",
+                                             className="mb-0 small"), className="pe-0"),
+                            dbc.Col(dbc.Switch(id="ass-inc-on", value=True,
+                                              className="mb-0"), className="col-auto"),
+                        ], className="align-items-center mb-1"),
                         dbc.Input(id="ass-inc", type="number",
                                   value=1300, min=0, className="mb-2"),
-                        dbc.Label("Assicurazione vita (€)"),
+                        dbc.Row([
+                            dbc.Col(dbc.Label("Assicurazione vita (€)",
+                                             className="mb-0 small"), className="pe-0"),
+                            dbc.Col(dbc.Switch(id="ass-vita-on", value=True,
+                                              className="mb-0"), className="col-auto"),
+                        ], className="align-items-center mb-1"),
                         dbc.Input(id="ass-vita", type="number",
                                   value=3500, min=0, className="mb-2"),
-                        dbc.Label("Costo atti donazione (€)"),
-                        dbc.Input(id="donaz-cost", type="number",
-                                  value=2500, min=0, className="mb-2"),
-                        dbc.Label("% mediatore creditizio"),
+                        html.Div([
+                            dbc.Row([
+                                dbc.Col(dbc.Label("Costo atti donazione (€)",
+                                                 className="mb-0 small"), className="pe-0"),
+                                dbc.Col(dbc.Switch(id="donaz-cost-on", value=True,
+                                                  className="mb-0"), className="col-auto"),
+                            ], className="align-items-center mb-1"),
+                            dbc.Input(id="donaz-cost", type="number",
+                                      value=2500, min=0, className="mb-2"),
+                        ], id="donaz-cost-section"),
+                        dbc.Row([
+                            dbc.Col(dbc.Label("% mediatore creditizio",
+                                             className="mb-0 small"), className="pe-0"),
+                            dbc.Col(dbc.Switch(id="kiron-on", value=True,
+                                              className="mb-0"), className="col-auto"),
+                        ], className="align-items-center mb-1"),
                         dbc.InputGroup([
                             dbc.Input(id="kiron-pct", type="number",
                                       value=2.0, min=0, max=10, step=0.1),

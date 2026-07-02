@@ -21,6 +21,7 @@ def register_risultati(app) -> None:
         offerta, anticipo, durata, tasso, tipo, rendita,
         mediatore, notaio, perizia, ass_inc, ass_vita,
         donaz_cost, kiron_pct, med_pct,
+        ass_inc_on, ass_vita_on, donaz_on, kiron_on,
     ):
         offerta = _safe(offerta, 100_000)
         anticipo = _safe(anticipo, 20_000)
@@ -29,10 +30,10 @@ def register_risultati(app) -> None:
         rendita = _safe(rendita, 206.58)
         notaio = _safe(notaio, 2000)
         perizia = _safe(perizia, 350)
-        ass_inc = _safe(ass_inc, 1300)
-        ass_vita = _safe(ass_vita, 3500)
-        donaz_cost = _safe(donaz_cost, 2500)
-        kiron_pct = _safe(kiron_pct, 2) / 100
+        ass_inc   = _safe(ass_inc,    1300) if ass_inc_on  != False else 0.0
+        ass_vita  = _safe(ass_vita,   3500) if ass_vita_on != False else 0.0
+        donaz_cost = _safe(donaz_cost, 2500) if donaz_on   != False else 0.0
+        kiron_pct = (_safe(kiron_pct,  2) / 100) if kiron_on != False else 0.0
         med_pct = _safe(med_pct, 4) / 100
 
         mutuo = max(offerta - anticipo, 0)
@@ -57,9 +58,12 @@ def register_risultati(app) -> None:
 
         # ── KPI row ────────────────────────────────────────────────────────
         kpi_row = dbc.Row([
-            dbc.Col(kpi_card("Mutuo", fe(mutuo), f"LTV {ltv:.1f}%", "primary", "🏦"), md=3),
-            dbc.Col(kpi_card("Rata mensile", fe(monthly, 2), f"per {durata} anni", "danger", "📆"), md=3),
-            dbc.Col(kpi_card("Costo totale iniziale", fe(items["TOTALE INIZIALE"]), "tutto incluso", "warning", "💰"), md=3),
+            dbc.Col(kpi_card("Mutuo", fe(mutuo),
+                    f"LTV {ltv:.1f}%", "primary", "🏦"), md=3),
+            dbc.Col(kpi_card("Rata mensile", fe(monthly, 2),
+                    f"per {durata} anni", "danger", "📆"), md=3),
+            dbc.Col(kpi_card("Costo totale iniziale", fe(
+                items["TOTALE INIZIALE"]), "tutto incluso", "warning", "💰"), md=3),
             dbc.Col(kpi_card(
                 "Interessi totali", fe(total_interest),
                 f"Risparmio fiscale ~{fe(tax_benefit_total, 0)}" if prima else "Nessuna detrazione",
@@ -73,10 +77,13 @@ def register_risultati(app) -> None:
             for k, v in items.items()
             if v > 0 and k != "TOTALE INIZIALE"
         ]
-        rows_table.append({"Voce": "TOTALE INIZIALE", "Importo": fe(items["TOTALE INIZIALE"], 2)})
+        rows_table.append({"Voce": "TOTALE INIZIALE",
+                          "Importo": fe(items["TOTALE INIZIALE"], 2)})
 
-        pie_labels = [k for k, v in items.items() if v > 0 and k != "TOTALE INIZIALE"]
-        pie_values = [v for k, v in items.items() if v > 0 and k != "TOTALE INIZIALE"]
+        pie_labels = [k for k, v in items.items() if v > 0 and k !=
+                      "TOTALE INIZIALE"]
+        pie_values = [v for k, v in items.items() if v > 0 and k !=
+                      "TOTALE INIZIALE"]
 
         pie_fig = go.Figure(go.Pie(
             labels=pie_labels, values=pie_values,
@@ -90,8 +97,10 @@ def register_risultati(app) -> None:
 
         cost_table = dash_table.DataTable(
             data=rows_table,
-            columns=[{"name": "Voce", "id": "Voce"}, {"name": "Importo", "id": "Importo"}],
-            style_cell={"textAlign": "left", "padding": "8px", "fontFamily": "inherit"},
+            columns=[{"name": "Voce", "id": "Voce"}, {
+                "name": "Importo", "id": "Importo"}],
+            style_cell={"textAlign": "left",
+                        "padding": "8px", "fontFamily": "inherit"},
             style_header={"fontWeight": "bold", "backgroundColor": "#f8fafc"},
             style_data_conditional=[
                 {"if": {"filter_query": '{Voce} = "TOTALE INIZIALE"'},
@@ -101,8 +110,10 @@ def register_risultati(app) -> None:
         )
 
         breakdown_row = dbc.Row([
-            dbc.Col([html.H5("Dettaglio costi iniziali", className="fw-bold mb-3"), cost_table], md=6),
-            dbc.Col(dcc.Graph(figure=pie_fig, config={"displayModeBar": False}), md=6),
+            dbc.Col([html.H5("Dettaglio costi iniziali",
+                    className="fw-bold mb-3"), cost_table], md=6),
+            dbc.Col(dcc.Graph(figure=pie_fig, config={
+                    "displayModeBar": False}), md=6),
         ], className="mb-4")
 
         # ── Amortization annual summary ────────────────────────────────────
@@ -130,12 +141,17 @@ def register_risultati(app) -> None:
             dbc.Col([
                 html.H5("Riepilogo mutuo", className="fw-bold mb-3"),
                 dbc.Table(html.Tbody([
-                    html.Tr([html.Td("Importo mutuo"), html.Td(fe(mutuo), className="fw-bold")]),
+                    html.Tr([html.Td("Importo mutuo"), html.Td(
+                        fe(mutuo), className="fw-bold")]),
                     html.Tr([html.Td("Tasso annuo"), html.Td(fp(tasso))]),
-                    html.Tr([html.Td("Durata"), html.Td(f"{durata} anni ({durata * 12} rate)")]),
-                    html.Tr([html.Td("Rata mensile"), html.Td(fe(monthly, 2), className="fw-bold text-danger")]),
-                    html.Tr([html.Td("Totale pagato"), html.Td(fe(total_paid))]),
-                    html.Tr([html.Td("di cui interessi passivi"), html.Td(fe(total_interest))]),
+                    html.Tr([html.Td("Durata"), html.Td(
+                        f"{durata} anni ({durata * 12} rate)")]),
+                    html.Tr([html.Td("Rata mensile"), html.Td(
+                        fe(monthly, 2), className="fw-bold text-danger")]),
+                    html.Tr([html.Td("Totale pagato"),
+                            html.Td(fe(total_paid))]),
+                    html.Tr([html.Td("di cui interessi passivi"),
+                            html.Td(fe(total_interest))]),
                     html.Tr([html.Td("Valore catastale"), html.Td(fe(val_cat))]),
                     *([] if not prima else [
                         html.Tr([html.Td("Detrazione fiscale annua (stimata)"),
@@ -145,7 +161,8 @@ def register_risultati(app) -> None:
                     ]),
                 ]), bordered=True, hover=True, size="sm"),
             ], md=5),
-            dbc.Col(dcc.Graph(figure=area_fig, config={"displayModeBar": False}), md=7),
+            dbc.Col(dcc.Graph(figure=area_fig, config={
+                    "displayModeBar": False}), md=7),
         ])
 
         return html.Div([kpi_row, breakdown_row, mortgage_info])

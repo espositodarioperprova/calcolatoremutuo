@@ -19,6 +19,11 @@ SIDEBAR_INPUTS: list[Input] = [
     Input("donaz-cost", "value"),
     Input("kiron-pct", "value"),
     Input("med-pct", "value"),
+    # Optional-cost enable switches
+    Input("ass-inc-on", "value"),
+    Input("ass-vita-on", "value"),
+    Input("donaz-cost-on", "value"),
+    Input("kiron-on", "value"),
 ]
 
 

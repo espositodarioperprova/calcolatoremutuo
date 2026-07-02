@@ -20,6 +20,7 @@ def register_sensitivity(app) -> None:
         offerta, anticipo, durata, tasso, tipo, rendita,
         mediatore, notaio, perizia, ass_inc, ass_vita,
         donaz_cost, kiron_pct, med_pct,
+        ass_inc_on, ass_vita_on, donaz_on, kiron_on,
     ):
         offerta = _safe(offerta, 100_000)
         anticipo = _safe(anticipo, 20_000)
@@ -28,10 +29,10 @@ def register_sensitivity(app) -> None:
         rendita = _safe(rendita, 206.58)
         notaio = _safe(notaio, 2000)
         perizia = _safe(perizia, 350)
-        ass_inc = _safe(ass_inc, 1300)
-        ass_vita = _safe(ass_vita, 3500)
-        donaz_cost = _safe(donaz_cost, 2500)
-        kiron_pct = _safe(kiron_pct, 2) / 100
+        ass_inc   = _safe(ass_inc,    1300) if ass_inc_on  != False else 0.0
+        ass_vita  = _safe(ass_vita,   3500) if ass_vita_on != False else 0.0
+        donaz_cost = _safe(donaz_cost, 2500) if donaz_on   != False else 0.0
+        kiron_pct = (_safe(kiron_pct,  2) / 100) if kiron_on != False else 0.0
         med_pct = _safe(med_pct, 4) / 100
         tipo = tipo or "prima"
         mutuo = max(offerta - anticipo, 0)
@@ -143,13 +144,17 @@ def register_sensitivity(app) -> None:
 
         return html.Div([
             dbc.Row([
-                dbc.Col(dcc.Graph(figure=heatmap_fig, config={"displayModeBar": False})),
+                dbc.Col(dcc.Graph(figure=heatmap_fig,
+                        config={"displayModeBar": False})),
             ], className="mb-3"),
             dbc.Row([
-                dbc.Col(dcc.Graph(figure=stress_fig, config={"displayModeBar": False}), md=6),
-                dbc.Col(dcc.Graph(figure=cost_fig, config={"displayModeBar": False}), md=6),
+                dbc.Col(dcc.Graph(figure=stress_fig, config={
+                        "displayModeBar": False}), md=6),
+                dbc.Col(dcc.Graph(figure=cost_fig, config={
+                        "displayModeBar": False}), md=6),
             ], className="mb-3"),
             dbc.Row([
-                dbc.Col(dcc.Graph(figure=tradeoff_fig, config={"displayModeBar": False})),
+                dbc.Col(dcc.Graph(figure=tradeoff_fig,
+                        config={"displayModeBar": False})),
             ]),
         ])

@@ -48,3 +48,40 @@ def register_sidebar_callbacks(app) -> None:
     )
     def toggle_adv(n, is_open):
         return not is_open
+
+    # ── Show "Costo atti donazione" only when tipo == prima_donaz ──────────
+    @app.callback(
+        Output("donaz-cost-section", "style"),
+        Input("tipo", "value"),
+    )
+    def toggle_donaz_section(tipo):
+        return {} if tipo == "prima_donaz" else {"display": "none"}
+
+    # ── Disable optional inputs when their switch is off ───────────────────
+    @app.callback(
+        Output("ass-inc", "disabled"),
+        Input("ass-inc-on", "value"),
+    )
+    def disable_ass_inc(on):
+        return not bool(on)
+
+    @app.callback(
+        Output("ass-vita", "disabled"),
+        Input("ass-vita-on", "value"),
+    )
+    def disable_ass_vita(on):
+        return not bool(on)
+
+    @app.callback(
+        Output("donaz-cost", "disabled"),
+        Input("donaz-cost-on", "value"),
+    )
+    def disable_donaz_cost(on):
+        return not bool(on)
+
+    @app.callback(
+        Output("kiron-pct", "disabled"),
+        Input("kiron-on", "value"),
+    )
+    def disable_kiron(on):
+        return not bool(on)

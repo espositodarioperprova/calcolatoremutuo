@@ -59,13 +59,15 @@ dash_app.layout = dbc.Container(
                                 ),
                                 html.Div(
                                     [
-                                        html.H2("Simulatore acquisto con Mutuo per rendita", className="mb-1"),
+                                        html.H2(
+                                            "Simulatore acquisto con Mutuo per rendita", className="mb-1"),
                                         html.P(
-                                            "Analisi completa per l'acquisto di un immobile in Italia",
+                                            "Analisi per l'acquisto di un immobile in Italia, a mezzo mutuo e con fini di rendita da locazione.",
                                             className="app-subtitle",
                                         ),
                                     ],
-                                    style={"position": "relative", "zIndex": "1"},
+                                    style={"position": "relative",
+                                           "zIndex": "1"},
                                 ),
                             ],
                             className="d-flex align-items-center",

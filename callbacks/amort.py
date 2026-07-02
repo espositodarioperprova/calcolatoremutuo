@@ -18,6 +18,7 @@ def register_amort(app) -> None:
         offerta, anticipo, durata, tasso, tipo, rendita,
         mediatore, notaio, perizia, ass_inc, ass_vita,
         donaz_cost, kiron_pct, med_pct,
+        ass_inc_on, ass_vita_on, donaz_on, kiron_on,
     ):
         offerta = _safe(offerta, 100_000)
         anticipo = _safe(anticipo, 20_000)
@@ -84,8 +85,10 @@ def register_amort(app) -> None:
         annual_table = dash_table.DataTable(
             data=annual.to_dict("records"),
             columns=[{"name": c, "id": c} for c in annual.columns],
-            style_cell={"textAlign": "right", "padding": "6px 10px", "fontFamily": "inherit"},
-            style_cell_conditional=[{"if": {"column_id": "Anno"}, "textAlign": "center"}],
+            style_cell={"textAlign": "right",
+                        "padding": "6px 10px", "fontFamily": "inherit"},
+            style_cell_conditional=[
+                {"if": {"column_id": "Anno"}, "textAlign": "center"}],
             style_header={"fontWeight": "bold", "backgroundColor": "#f8fafc"},
             style_data_conditional=[
                 {"if": {"row_index": "odd"}, "backgroundColor": "#fafbff"},
@@ -114,8 +117,10 @@ def register_amort(app) -> None:
 
         return html.Div([
             dbc.Row([
-                dbc.Col(dcc.Graph(figure=balance_fig, config={"displayModeBar": False}), md=6),
-                dbc.Col(dcc.Graph(figure=ic_fig, config={"displayModeBar": False}), md=6),
+                dbc.Col(dcc.Graph(figure=balance_fig, config={
+                        "displayModeBar": False}), md=6),
+                dbc.Col(dcc.Graph(figure=ic_fig, config={
+                        "displayModeBar": False}), md=6),
             ], className="mb-4"),
             html.H5("Riepilogo annuale", className="fw-bold mb-2"),
             annual_table,

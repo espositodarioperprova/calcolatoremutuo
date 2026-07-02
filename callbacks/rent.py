@@ -31,6 +31,7 @@ def register_rent(app) -> None:
         offerta, anticipo, durata, tasso, tipo, rendita,
         mediatore, notaio, perizia, ass_inc, ass_vita,
         donaz_cost, kiron_pct, med_pct,
+        ass_inc_on, ass_vita_on, donaz_on, kiron_on,
     ):
         offerta = _safe(offerta, 100_000)
         anticipo = _safe(anticipo, 20_000)
@@ -39,10 +40,10 @@ def register_rent(app) -> None:
         rendita_val = _safe(rendita, 206.58)
         notaio = _safe(notaio, 2000)
         perizia = _safe(perizia, 350)
-        ass_inc = _safe(ass_inc, 1300)
-        ass_vita = _safe(ass_vita, 3500)
-        donaz_cost = _safe(donaz_cost, 2500)
-        kiron_pct = _safe(kiron_pct, 2) / 100
+        ass_inc   = _safe(ass_inc,    1300) if ass_inc_on  != False else 0.0
+        ass_vita  = _safe(ass_vita,   3500) if ass_vita_on != False else 0.0
+        donaz_cost = _safe(donaz_cost, 2500) if donaz_on   != False else 0.0
+        kiron_pct = (_safe(kiron_pct,  2) / 100) if kiron_on != False else 0.0
         med_pct = _safe(med_pct, 4) / 100
         tipo = tipo or "prima_donaz"
 
@@ -56,8 +57,16 @@ def register_rent(app) -> None:
 
         # Sensible default: gross yield ~4.8% → 0.4% of price per month
         default_affitto = max(round(offerta * 0.004 / 50) * 50, 300)
-        # Default IMU rate: 0 for prima casa, 0.96% for seconda
-        default_imu = 0.0 if tipo == "prima" else 0.96
+        # Default IMU rate: 0 for prima casa (entrambe le categorie), 0.96% per seconda
+        default_imu = 0.0 if tipo in ("prima", "prima_donaz") else 0.96
+        imu_default_ann = rendita_val * 1.05 * 160 * default_imu / 100
+        if imu_default_ann > 0:
+            imu_formula_text = (
+                f"Rendita × 1.05 × 160 × {default_imu:.2f}% → "
+                f"{fe(imu_default_ann, 0)}/anno · {fe(imu_default_ann / 12, 1)}/mese"
+            )
+        else:
+            imu_formula_text = "Prima casa: esente da IMU (art. 13 c.2 D.L. 201/2011)"
 
         return html.Div([
             dbc.Row([
@@ -171,13 +180,13 @@ def register_rent(app) -> None:
 
                     dbc.Row([
                         dbc.Col([
-                            dbc.Label("IMU (%/anno su valore catastale)"),
+                            dbc.Label("Aliquota IMU (%/anno — A/2·A/3·A/4 coeff. 160)"),
                             dbc.InputGroup([
                                 dbc.Input(id="imu-rate", type="number",
                                           value=default_imu, min=0, max=3, step=0.01),
                                 dbc.InputGroupText("%"),
                             ]),
-                            dbc.FormText("0 per prima casa; ~0.86–1.06% per seconda"),
+                            dbc.FormText(imu_formula_text),
                         ]),
                         dbc.Col([
                             dbc.Label("Costi dismissione/vendita (% valore finale)"),

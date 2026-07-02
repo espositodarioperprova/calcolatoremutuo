@@ -14,8 +14,10 @@ from core.solvers import (
 from utils import fe, fp
 from .shared import SIDEBAR_INPUTS, _safe
 
-_DT_CELL = {"textAlign": "center", "padding": "6px 10px", "fontFamily": "inherit"}
-_DT_HEAD = {"fontWeight": "bold", "backgroundColor": "#f8fafc", "textAlign": "center"}
+_DT_CELL = {"textAlign": "center",
+            "padding": "6px 10px", "fontFamily": "inherit"}
+_DT_HEAD = {"fontWeight": "bold",
+            "backgroundColor": "#f8fafc", "textAlign": "center"}
 
 
 def register_inverse(app) -> None:
@@ -30,6 +32,7 @@ def register_inverse(app) -> None:
         mediatore, notaio, perizia, ass_inc, ass_vita,
         donaz_cost, kiron_pct, med_pct,
         spotlight_budget, spotlight_pct_ref,
+        ass_inc_on, ass_vita_on, donaz_on, kiron_on,
     ):
         tasso_r = _safe(tasso, 3.2) / 100
         rendita = _safe(rendita, 206.58)
@@ -38,10 +41,10 @@ def register_inverse(app) -> None:
         anticipo = _safe(anticipo, 20_000)
         notaio = _safe(notaio, 2000)
         perizia = _safe(perizia, 350)
-        ass_inc = _safe(ass_inc, 1300)
-        ass_vita = _safe(ass_vita, 3500)
-        donaz_cost = _safe(donaz_cost, 2500)
-        kiron_pct = _safe(kiron_pct, 2) / 100
+        ass_inc   = _safe(ass_inc,    1300) if ass_inc_on  != False else 0.0
+        ass_vita  = _safe(ass_vita,   3500) if ass_vita_on != False else 0.0
+        donaz_cost = _safe(donaz_cost, 2500) if donaz_on   != False else 0.0
+        kiron_pct = (_safe(kiron_pct,  2) / 100) if kiron_on != False else 0.0
         med_pct = _safe(med_pct, 4) / 100
         tipo = tipo or "prima"
         pct_anti = anticipo / offerta if offerta > 0 else 0.20
@@ -67,7 +70,8 @@ def register_inverse(app) -> None:
             data=grid,
             columns=[{"name": c, "id": c} for c in grid[0].keys()],
             style_cell=_DT_CELL, style_header=_DT_HEAD,
-            style_data_conditional=[{"if": {"column_id": "% Anticipo"}, "fontWeight": "bold"}],
+            style_data_conditional=[
+                {"if": {"column_id": "% Anticipo"}, "fontWeight": "bold"}],
             style_table={"overflowX": "auto"},
         )
 
@@ -86,7 +90,8 @@ def register_inverse(app) -> None:
             data=grid_b,
             columns=[{"name": c, "id": c} for c in grid_b[0].keys()],
             style_cell=_DT_CELL, style_header=_DT_HEAD,
-            style_data_conditional=[{"if": {"column_id": "% Anticipo"}, "fontWeight": "bold"}],
+            style_data_conditional=[
+                {"if": {"column_id": "% Anticipo"}, "fontWeight": "bold"}],
             style_table={"overflowX": "auto"},
         )
 
@@ -111,8 +116,10 @@ def register_inverse(app) -> None:
                         html.H3(fe(home_q), className="text-success fw-bold"),
                         html.P("Valore massimo dell'immobile"),
                         html.P([html.Strong("Anticipo: "), fe(home_q * pct_q)]),
-                        html.P([html.Strong("Mutuo: "), fe(home_q * (1 - pct_q))]),
-                        html.P([html.Strong("Rata mensile: "), fe(monthly_q, 2), " / mese"]),
+                        html.P([html.Strong("Mutuo: "),
+                               fe(home_q * (1 - pct_q))]),
+                        html.P([html.Strong("Rata mensile: "),
+                               fe(monthly_q, 2), " / mese"]),
                     ], md=6),
                     dbc.Col([
                         html.H6("Come si distribuisce il budget:"),
@@ -148,7 +155,8 @@ def register_inverse(app) -> None:
             data=grid_d,
             columns=[{"name": c, "id": c} for c in grid_d[0].keys()],
             style_cell=_DT_CELL, style_header=_DT_HEAD,
-            style_data_conditional=[{"if": {"column_id": "Prezzo immobile"}, "fontWeight": "bold"}],
+            style_data_conditional=[
+                {"if": {"column_id": "Prezzo immobile"}, "fontWeight": "bold"}],
             style_table={"overflowX": "auto"},
         )
 
@@ -167,7 +175,8 @@ def register_inverse(app) -> None:
             data=grid_e,
             columns=[{"name": c, "id": c} for c in grid_e[0].keys()],
             style_cell=_DT_CELL, style_header=_DT_HEAD,
-            style_data_conditional=[{"if": {"column_id": "Rata max"}, "fontWeight": "bold"}],
+            style_data_conditional=[
+                {"if": {"column_id": "Rata max"}, "fontWeight": "bold"}],
             style_table={"overflowX": "auto"},
         )
 
