@@ -261,15 +261,17 @@ def register_rent(app) -> None:
                         ], className="py-2"),
                     ], className="mb-3 border", style={"borderRadius": "8px"}),
 
-                ], md=5),
+                ]),
 
-                # ── Right: waterfall chart + results ────────────────────────────
+                # ── Right: waterfall chart fixed 300×300 ───────────────────────────
                 dbc.Col([
                     dcc.Graph(id="waterfall-chart",
-                              config={"displayModeBar": False}),
-                    html.Div(id="investment-results"),
-                ], md=7),
+                              config={"displayModeBar": False, "responsive": False},
+                              style={"height": "300px", "width": "300px"}),
+                ], className="col-auto"),
             ]),
+
+            html.Div(id="investment-results", className="mt-3"),
 
             dbc.Row([
                 dbc.Col(dcc.Graph(id="cumulative-return-chart",
@@ -492,7 +494,7 @@ def register_rent(app) -> None:
         ))
         waterfall_fig.update_layout(
             title=f"Cashflow mensile (anno\u00a01) \u2014 Affitto lordo {fe(affitto_lordo, 0)}/mese",
-            height=300, margin=dict(t=50, b=40, l=50, r=20), showlegend=False,
+            height=300, width=300, autosize=False, margin=dict(t=50, b=40, l=50, r=20), showlegend=False,
         )
 
         # ── Chart 2: Cumulative P&L ────────────────────────────────────────
