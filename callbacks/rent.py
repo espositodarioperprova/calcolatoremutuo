@@ -55,7 +55,7 @@ def register_rent(app) -> None:
         monthly_pmt_v = pmt(mutuo, tasso_r, durata)
 
         default_affitto = max(int(offerta * 0.0054 / 10) * 10, 300)
-        default_imu = 0.0 if tipo in ("prima", "prima_donaz") else 0.96
+        default_imu = 0.0 if tipo in ("prima", "prima_donaz") else 1.06
         imu_default_ann = rendita_v * 1.05 * 160 * default_imu / 100
         if imu_default_ann > 0:
             imu_text = (
