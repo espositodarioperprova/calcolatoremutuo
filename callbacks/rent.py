@@ -126,7 +126,7 @@ def register_rent(app) -> None:
                                           value=5.0, min=0, max=30, step=0.1),
                                 dbc.InputGroupText("%"),
                             ]),
-                                        ]),
+                        ]),
                         dbc.Col([
                             dbc.Label("Rivalutazione immobile (%/anno)"),
                             dbc.InputGroup([
@@ -139,71 +139,72 @@ def register_rent(app) -> None:
 
 
 
+                    # ── 4-col: manutenzione + ricerca ─────────────────────
                     dbc.Row([
                         dbc.Col([
-                            dbc.Label("Manutenzione straordinaria"),
+                            dbc.Label("Mant. straord.", className="small fw-semibold"),
                             dbc.InputGroup([
                                 dbc.Input(id="manutenzione-freq", type="number",
                                           value=0.2, min=0, max=5, step=0.05),
-                                dbc.InputGroupText("ev/anno"),
-                            ], className="mb-1"),
+                                dbc.InputGroupText("ev/a"),
+                            ], size="sm"),
+                        ], xs=6, md=3),
+                        dbc.Col([
+                            dbc.Label("Costo evento", className="small fw-semibold"),
                             dbc.InputGroup([
                                 dbc.Input(id="manutenzione-costo", type="number",
                                           value=3000, min=0, step=500),
-                                dbc.InputGroupText("\u20ac/ev"),
-                            ]),
-                            dbc.FormText(
-                                "0.2 ev/anno \u00d7 \u20ac3\u202f000 = \u20ac600/anno"),
-                        ]),
-                    ], className="mb-1"),
-
-                    dbc.Row([
+                                dbc.InputGroupText("\u20ac"),
+                            ], size="sm"),
+                        ], xs=6, md=3),
                         dbc.Col([
-                            dbc.Label("Ricerca inquilino"),
+                            dbc.Label("Ricerca inq.", className="small fw-semibold"),
                             dbc.InputGroup([
                                 dbc.Input(id="ricerca-costo", type="number",
                                           value=500, min=0, step=100),
-                                dbc.InputGroupText("\u20ac/evento"),
-                            ], className="mb-1"),
+                                dbc.InputGroupText("\u20ac"),
+                            ], size="sm"),
+                        ], xs=6, md=3),
+                        dbc.Col([
+                            dbc.Label("Freq. ricerca", className="small fw-semibold"),
                             dbc.InputGroup([
                                 dbc.Input(id="ricerca-freq", type="number",
                                           value=0.5, min=0, max=5, step=0.1),
-                                dbc.InputGroupText("eventi/anno"),
-                            ]),
-                            dbc.FormText("0.5 = ogni 2 anni"),
-                        ]),
+                                dbc.InputGroupText("ev/a"),
+                            ], size="sm"),
+                        ], xs=6, md=3),
+                    ], className="mb-1 g-2"),
+
+                    # ── 3-col: IMU + costi vendita + anno uscita ──────────
+                    dbc.Row([
                         dbc.Col([
-                            dbc.Label(
-                                "Aliquota IMU (%/anno \u2014 A/2\u00b7A/3\u00b7A/4 coeff.\u00a0160)"),
+                            dbc.Label("IMU (%/anno)", className="small fw-semibold"),
                             dbc.InputGroup([
                                 dbc.Input(id="imu-rate", type="number",
                                           value=default_imu, min=0, max=3, step=0.01),
                                 dbc.InputGroupText("%"),
-                            ]),
+                            ], size="sm"),
                             dbc.FormText(imu_text),
-                        ]),
-                    ], className="mb-1"),
-
-                    dbc.Row([
+                        ], xs=12, md=4),
                         dbc.Col([
-                            dbc.Label("Costi vendita (% valore finale)"),
+                            dbc.Label("Costi vendita", className="small fw-semibold"),
                             dbc.InputGroup([
                                 dbc.Input(id="costo-vendita-pct", type="number",
                                           value=4.0, min=0, max=15, step=0.5),
                                 dbc.InputGroupText("%"),
-                            ]),
-                        ]),
+                            ], size="sm"),
+                        ], xs=6, md=4),
                         dbc.Col([
-                            dbc.Label("Anno di uscita (opzionale)"),
+                            dbc.Label("Anno uscita", className="small fw-semibold"),
                             dbc.InputGroup([
                                 dbc.Input(id="anno-uscita", type="number",
                                           value=None,
                                           placeholder=f"default: {int(durata)}",
                                           min=1, max=60, step=1),
-                                dbc.InputGroupText("anni"),
-                            ]),
-                        ]),
-                    ], className="mb-1"),
+                                dbc.InputGroupText("a"),
+                            ], size="sm"),
+                        ], xs=6, md=4),
+                    ], className="mb-1 g-2"),
 
                     # ── Crescita canone section ────────────────────────────
                     dbc.Card([
@@ -252,7 +253,8 @@ def register_rent(app) -> None:
                 # ── Right: waterfall chart fixed 300×300 ───────────────────────────
                 dbc.Col([
                     dcc.Graph(id="waterfall-chart",
-                              config={"displayModeBar": False, "responsive": False},
+                              config={"displayModeBar": False,
+                                      "responsive": False},
                               style={"height": "400px", "width": "500px"}),
                 ], className="col-auto"),
             ]),
