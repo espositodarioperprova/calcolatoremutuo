@@ -21,7 +21,8 @@ def build_sidebar() -> dbc.Card:
                     id="offerta", type="number",
                     value=100_000, min=10_000, step=5_000, className="mb-1",
                 ),
-                dbc.FormText("Prezzo concordato con il venditore. Usa il cursore o digita il valore.", className="mb-1"),
+                dbc.FormText(
+                    "Prezzo concordato con il venditore. Usa il cursore o digita il valore.", className="mb-1"),
                 dcc.Slider(
                     id="offerta-slider", min=50_000, max=1_000_000,
                     step=10_000, value=100_000, marks=None,
@@ -69,7 +70,7 @@ def build_sidebar() -> dbc.Card:
                         {"label": "Seconda casa / Non prima casa",
                          "value": "seconda"},
                     ],
-                    value="prima_donaz",
+                    value="seconda",
                     className="small mb-1",
                 ),
                 dbc.FormText(
@@ -105,11 +106,13 @@ def build_sidebar() -> dbc.Card:
                         dbc.Label("Oneri notaio per l'acquisto (€)"),
                         dbc.Input(id="notaio", type="number",
                                   value=2000, min=0, className="mb-1"),
-                        dbc.FormText("Onorario notarile + imposte di registro, ipotecaria e catastale", className="mb-2"),
+                        dbc.FormText(
+                            "Onorario notarile + imposte di registro, ipotecaria e catastale", className="mb-2"),
                         dbc.Label("Perizia immobile (€)"),
                         dbc.Input(id="perizia-val", type="number",
                                   value=350, min=0, className="mb-1"),
-                        dbc.FormText("Perizia tecnica richiesta dalla banca prima dell'erogazione", className="mb-2"),
+                        dbc.FormText(
+                            "Perizia tecnica richiesta dalla banca prima dell'erogazione", className="mb-2"),
                         # ── Optional costs with enable switches ───────────
                         dbc.Row([
                             dbc.Col(dbc.Label("Assicurazione incendio (€)",
@@ -119,7 +122,8 @@ def build_sidebar() -> dbc.Card:
                         ], className="align-items-center mb-1"),
                         dbc.Input(id="ass-inc", type="number",
                                   value=1300, min=0, className="mb-1"),
-                        dbc.FormText("Polizza incendio/scoppio: obbligatoria per il perfezionamento dell'ipoteca", className="mb-2"),
+                        dbc.FormText(
+                            "Polizza incendio/scoppio: obbligatoria per il perfezionamento dell'ipoteca", className="mb-2"),
                         dbc.Row([
                             dbc.Col(dbc.Label("Assicurazione vita (€)",
                                               className="mb-0 small"), className="pe-0"),
@@ -128,7 +132,8 @@ def build_sidebar() -> dbc.Card:
                         ], className="align-items-center mb-1"),
                         dbc.Input(id="ass-vita", type="number",
                                   value=3500, min=0, className="mb-1"),
-                        dbc.FormText("Polizza vita decrescente: protegge il mutuo in caso di decesso del mutuatario", className="mb-2"),
+                        dbc.FormText(
+                            "Polizza vita decrescente: protegge il mutuo in caso di decesso del mutuatario", className="mb-2"),
                         html.Div([
                             dbc.Row([
                                 dbc.Col(dbc.Label("Costo atti donazione (€)",
@@ -138,7 +143,8 @@ def build_sidebar() -> dbc.Card:
                             ], className="align-items-center mb-1"),
                             dbc.Input(id="donaz-cost", type="number",
                                       value=2500, min=0, className="mb-1"),
-                            dbc.FormText("Atto notarile di donazione della prima casa precedente (onorario + imposte)", className="mb-2"),
+                            dbc.FormText(
+                                "Atto notarile di donazione della prima casa precedente (onorario + imposte)", className="mb-2"),
                         ], id="donaz-cost-section"),
                         dbc.Row([
                             dbc.Col(dbc.Label("% mediatore creditizio",
@@ -151,14 +157,16 @@ def build_sidebar() -> dbc.Card:
                                       value=2.0, min=0, max=10, step=0.1),
                             dbc.InputGroupText("%"),
                         ], className="mb-1"),
-                        dbc.FormText("Commissione broker/mediatore creditizio sul capitale erogato", className="mb-2"),
+                        dbc.FormText(
+                            "Commissione broker/mediatore creditizio sul capitale erogato", className="mb-2"),
                         dbc.Label("% agenzia immobiliare"),
                         dbc.InputGroup([
                             dbc.Input(id="med-pct", type="number",
                                       value=4.0, min=0, max=10, step=0.1),
                             dbc.InputGroupText("%"),
                         ]),
-                        dbc.FormText("Provvigione agenzia immobiliare sul prezzo di acquisto (IVA 22% inclusa, max €5 000)"),
+                        dbc.FormText(
+                            "Provvigione agenzia immobiliare sul prezzo di acquisto (IVA 22% inclusa, max €5 000)"),
                     ]), className="border-0"),
                     id="adv-collapse",
                     is_open=True,
