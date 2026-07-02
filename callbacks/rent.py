@@ -70,15 +70,13 @@ def register_rent(app) -> None:
                 # ── Left: inputs ──────────────────────────────────────────
                 dbc.Col([
                     html.H5("Parametri investimento",
-                            className="fw-bold mb-3"),
+                            className="fw-bold mb-2"),
 
                     dbc.Row([
                         dbc.Col([
                             dbc.Label("Affitto mensile lordo (\u20ac)"),
                             dbc.Input(id="affitto", type="number",
                                       value=default_affitto, min=0, step=1),
-                            dbc.FormText(
-                                "Canone da contratto, prima di vacancy e imposte. Il lordo entra in tutte le metriche di rendimento."),
                         ]),
                         dbc.Col([
                             dbc.Label("Regime fiscale locazione"),
@@ -96,10 +94,8 @@ def register_rent(app) -> None:
                                 ],
                                 value="cs21", className="form-select",
                             ),
-                            dbc.FormText(
-                                "Cedolare secca 21% è la scelta più comune per il libero mercato. Concordato al 10% solo con comune convenzionato."),
                         ]),
-                    ], className="mb-2"),
+                    ], className="mb-1"),
 
                     dbc.Row([
                         dbc.Col([
@@ -130,9 +126,7 @@ def register_rent(app) -> None:
                                           value=5.0, min=0, max=30, step=0.1),
                                 dbc.InputGroupText("%"),
                             ]),
-                            dbc.FormText(
-                                "Se IRR > sconto → investimento crea valore vs benchmark. Usato nel calcolo del NPV."),
-                        ]),
+                                        ]),
                         dbc.Col([
                             dbc.Label("Rivalutazione immobile (%/anno)"),
                             dbc.InputGroup([
@@ -140,10 +134,8 @@ def register_rent(app) -> None:
                                           value=2.0, min=0, max=20, step=0.1),
                                 dbc.InputGroupText("%"),
                             ]),
-                            dbc.FormText(
-                                "Incide sul valore terminale e indicizza i costi operativi. Storico ISTAT abitativo: ~2–3%/anno."),
                         ]),
-                    ], className="mb-2"),
+                    ], className="mb-1"),
 
 
 
@@ -163,7 +155,7 @@ def register_rent(app) -> None:
                             dbc.FormText(
                                 "0.2 ev/anno \u00d7 \u20ac3\u202f000 = \u20ac600/anno"),
                         ]),
-                    ], className="mb-2"),
+                    ], className="mb-1"),
 
                     dbc.Row([
                         dbc.Col([
@@ -190,7 +182,7 @@ def register_rent(app) -> None:
                             ]),
                             dbc.FormText(imu_text),
                         ]),
-                    ], className="mb-2"),
+                    ], className="mb-1"),
 
                     dbc.Row([
                         dbc.Col([
@@ -200,7 +192,6 @@ def register_rent(app) -> None:
                                           value=4.0, min=0, max=15, step=0.5),
                                 dbc.InputGroupText("%"),
                             ]),
-                            dbc.FormText("Agenzie, notaio, eventuali imposte"),
                         ]),
                         dbc.Col([
                             dbc.Label("Anno di uscita (opzionale)"),
@@ -211,13 +202,8 @@ def register_rent(app) -> None:
                                           min=1, max=60, step=1),
                                 dbc.InputGroupText("anni"),
                             ]),
-                            dbc.FormText(
-                                f"Vuoto = {int(durata)} anni. "
-                                f"< {int(durata)}: vendita anticipata + saldo residuo detratto. "
-                                f"> {int(durata)}: CF post-mutuo inclusi."
-                            ),
                         ]),
-                    ], className="mb-2"),
+                    ], className="mb-1"),
 
                     # ── Crescita canone section ────────────────────────────
                     dbc.Card([
@@ -259,7 +245,7 @@ def register_rent(app) -> None:
                                 ]),
                             ]),
                         ], className="py-2"),
-                    ], className="mb-3 border", style={"borderRadius": "8px"}),
+                    ], className="mb-2 border", style={"borderRadius": "8px"}),
 
                 ]),
 
@@ -267,7 +253,7 @@ def register_rent(app) -> None:
                 dbc.Col([
                     dcc.Graph(id="waterfall-chart",
                               config={"displayModeBar": False, "responsive": False},
-                              style={"height": "300px", "width": "300px"}),
+                              style={"height": "400px", "width": "500px"}),
                 ], className="col-auto"),
             ]),
 
@@ -494,7 +480,7 @@ def register_rent(app) -> None:
         ))
         waterfall_fig.update_layout(
             title=f"Cashflow mensile (anno\u00a01) \u2014 Affitto lordo {fe(affitto_lordo, 0)}/mese",
-            height=300, width=300, autosize=False, margin=dict(t=50, b=40, l=50, r=20), showlegend=False,
+            height=400, width=500, autosize=False, margin=dict(t=50, b=40, l=50, r=20), showlegend=False,
         )
 
         # ── Chart 2: Cumulative P&L ────────────────────────────────────────
