@@ -4,6 +4,8 @@ from __future__ import annotations
 import dash_bootstrap_components as dbc
 from dash import html
 
+from ui.metodologia import build_metodologia_tab
+
 
 def build_tabs() -> dbc.Tabs:
     """Return the dbc.Tabs component with all six analysis tabs."""
@@ -106,7 +108,8 @@ def build_tabs() -> dbc.Tabs:
                                         ),
                                         dbc.InputGroupText("anni"),
                                     ]),
-                                    dbc.FormText("Anno in cui estingui il mutuo residuo"),
+                                    dbc.FormText(
+                                        "Anno in cui estingui il mutuo residuo"),
                                 ], xs=12, sm=4),
                                 dbc.Col([
                                     dbc.Label("Rendimento investimento alternativo",
@@ -143,6 +146,7 @@ def build_tabs() -> dbc.Tabs:
                     html.Div(id="tab-estinzione-content"),
                 ]),
             ),
+            build_metodologia_tab(),
         ],
         id="main-tabs",
         active_tab="tab-risultati",

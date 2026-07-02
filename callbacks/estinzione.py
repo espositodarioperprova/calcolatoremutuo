@@ -28,20 +28,20 @@ def register_estinzione(app) -> None:
         anno_estinzione, r_alt, applica_detraibilita,
     ):
         # ── Sidebar params ─────────────────────────────────────────────────
-        offerta  = _safe(offerta, 100_000)
+        offerta = _safe(offerta, 100_000)
         anticipo = _safe(anticipo, 20_000)
-        durata   = int(_safe(durata, 30))
-        tasso_r  = _safe(tasso, 3.2) / 100
-        tipo     = tipo or "prima"
-        prima    = tipo in ("prima", "prima_donaz")
+        durata = int(_safe(durata, 30))
+        tasso_r = _safe(tasso, 3.2) / 100
+        tipo = tipo or "prima"
+        prima = tipo in ("prima", "prima_donaz")
 
-        mutuo         = max(offerta - anticipo, 0.0)
-        monthly_pmt   = pmt(mutuo, tasso_r, durata)
+        mutuo = max(offerta - anticipo, 0.0)
+        monthly_pmt = pmt(mutuo, tasso_r, durata)
         durata_months = durata * 12
 
         # ── Tab-specific params ────────────────────────────────────────────
-        X         = int(_safe(anno_estinzione, 0) or 0)
-        r_alt_v   = _safe(r_alt, 5.0) / 100
+        X = int(_safe(anno_estinzione, 0) or 0)
+        r_alt_v = _safe(r_alt, 5.0) / 100
         apply_det = bool(applica_detraibilita)
 
         if X <= 0 or X >= durata:
@@ -66,18 +66,18 @@ def register_estinzione(app) -> None:
                 )
             return max(mutuo - monthly_pmt * t, 0.0)
 
-        lump_sum         = _remaining(X * 12)
+        lump_sum = _remaining(X * 12)
         remaining_months = (durata - X) * 12
-        remaining_years  = durata - X
+        remaining_years = durata - X
 
         # ── Effective mortgage rate (net of tax deductibility if prima casa) ──
         # 19% deductibility on interest paid, up to €4 000/year
-        balance_start_X  = _remaining((X - 1) * 12)
-        interest_year_X  = balance_start_X * tasso_r
+        balance_start_X = _remaining((X - 1) * 12)
+        interest_year_X = balance_start_X * tasso_r
         if apply_det and prima and interest_year_X > 0:
-            tax_saving      = min(interest_year_X, 4_000) * 0.19
+            tax_saving = min(interest_year_X, 4_000) * 0.19
             eff_saving_rate = tax_saving / max(lump_sum, 1.0)
-            eff_rate        = max(tasso_r - eff_saving_rate, 0.0)
+            eff_rate = max(tasso_r - eff_saving_rate, 0.0)
         else:
             eff_rate = tasso_r
 
@@ -86,7 +86,8 @@ def register_estinzione(app) -> None:
         # Positive → extinguish is better than investing at r_alt
         r_alt_m = (1 + r_alt_v) ** (1 / 12) - 1
         if r_alt_m > 1e-10:
-            pv_savings = monthly_pmt * (1 - (1 + r_alt_m) ** (-remaining_months)) / r_alt_m
+            pv_savings = monthly_pmt * \
+                (1 - (1 + r_alt_m) ** (-remaining_months)) / r_alt_m
         else:
             pv_savings = monthly_pmt * remaining_months
 
@@ -98,7 +99,7 @@ def register_estinzione(app) -> None:
             return -lump_sum + monthly_pmt * (1 - (1 + r_m) ** (-remaining_months)) / r_m
 
         try:
-            r_be_m   = brentq(_npv_brk, 1e-10, 0.12 / 12, maxiter=200)
+            r_be_m = brentq(_npv_brk, 1e-10, 0.12 / 12, maxiter=200)
             r_be_ann = (1 + r_be_m) ** 12 - 1
         except Exception:
             r_be_ann = eff_rate  # fallback
@@ -106,7 +107,7 @@ def register_estinzione(app) -> None:
         extinguish_better = r_alt_v < r_be_ann
 
         # ── Chart 1: Annual CF savings (bar chart) ─────────────────────────
-        yrs  = list(range(1, durata + 1))
+        yrs = list(range(1, durata + 1))
         cf_quo_ann = [-monthly_pmt * 12] * durata
         cf_est_ann = [-monthly_pmt * 12 if yr <= X else 0.0 for yr in yrs]
 
@@ -132,10 +133,10 @@ def register_estinzione(app) -> None:
         # ── Chart 2: Cumulative wealth comparison from year X ──────────────
         # wealth_A[m] = -lump_sum + monthly_pmt × m   (savings from extinguishment)
         # wealth_B[m] = lump_sum × ((1+r_alt_m)^m − 1)  (investment gains on same capital)
-        m_range    = list(range(0, remaining_months + 1))
-        yr_range   = [m / 12 for m in m_range]
-        wealth_A   = [-lump_sum + monthly_pmt * m for m in m_range]
-        wealth_B   = [lump_sum * ((1 + r_alt_m) ** m - 1) for m in m_range]
+        m_range = list(range(0, remaining_months + 1))
+        yr_range = [m / 12 for m in m_range]
+        wealth_A = [-lump_sum + monthly_pmt * m for m in m_range]
+        wealth_B = [lump_sum * ((1 + r_alt_m) ** m - 1) for m in m_range]
 
         # Find crossover (where A first surpasses B or they equate)
         crossover_yr = None
@@ -169,12 +170,13 @@ def register_estinzione(app) -> None:
         )
 
         # ── Chart 3: NPV(Estingui) sensitivity to r_alt ────────────────────
-        r_range  = np.linspace(0.001, 0.12, 60)
+        r_range = np.linspace(0.001, 0.12, 60)
         npv_sens = []
         for ra in r_range:
             ra_m = (1 + ra) ** (1 / 12) - 1
             if ra_m > 1e-10:
-                pv = monthly_pmt * (1 - (1 + ra_m) ** (-remaining_months)) / ra_m
+                pv = monthly_pmt * (1 - (1 + ra_m) **
+                                    (-remaining_months)) / ra_m
             else:
                 pv = monthly_pmt * remaining_months
             npv_sens.append(-lump_sum + pv)
@@ -218,17 +220,19 @@ def register_estinzione(app) -> None:
                          style={"fontSize": "0.68rem", "color": "#64748b"}),
                 html.Div(fe(lump_sum),
                          style={"fontSize": "1.4rem", "fontWeight": "700", "color": "#ef4444"}),
-                html.Small("da versare per estinguere", className="text-muted"),
+                html.Small("da versare per estinguere",
+                           className="text-muted"),
             ], className="p-3 text-center rounded",
-               style={"background": "#f8fafc", "border": "1px solid #e2e8f0"})),
+                style={"background": "#f8fafc", "border": "1px solid #e2e8f0"})),
             dbc.Col(html.Div([
                 html.Div("Rata mensile liberata",
                          style={"fontSize": "0.68rem", "color": "#64748b"}),
                 html.Div(f"+{fe(monthly_pmt, 2)}/mese",
                          style={"fontSize": "1.4rem", "fontWeight": "700", "color": "#10b981"}),
-                html.Small(f"per {remaining_years} anni", className="text-muted"),
+                html.Small(f"per {remaining_years} anni",
+                           className="text-muted"),
             ], className="p-3 text-center rounded",
-               style={"background": "#f8fafc", "border": "1px solid #e2e8f0"})),
+                style={"background": "#f8fafc", "border": "1px solid #e2e8f0"})),
             dbc.Col(html.Div([
                 html.Div("Tasso mutuo effettivo",
                          style={"fontSize": "0.68rem", "color": "#64748b"}),
@@ -236,15 +240,16 @@ def register_estinzione(app) -> None:
                          style={"fontSize": "1.4rem", "fontWeight": "700", "color": "#3b82f6"}),
                 html.Small(det_note, className="text-muted"),
             ], className="p-3 text-center rounded",
-               style={"background": "#f8fafc", "border": "1px solid #e2e8f0"})),
+                style={"background": "#f8fafc", "border": "1px solid #e2e8f0"})),
             dbc.Col(html.Div([
                 html.Div("Breakeven tasso alternativo",
                          style={"fontSize": "0.68rem", "color": "#64748b"}),
                 html.Div(fp(r_be_ann),
                          style={"fontSize": "1.4rem", "fontWeight": "700", "color": "#f59e0b"}),
-                html.Small("oltre cui conviene investire", className="text-muted"),
+                html.Small("oltre cui conviene investire",
+                           className="text-muted"),
             ], className="p-3 text-center rounded",
-               style={"background": "#f8fafc", "border": "1px solid #e2e8f0"})),
+                style={"background": "#f8fafc", "border": "1px solid #e2e8f0"})),
         ], className="mb-3 g-3")
 
         return html.Div([
@@ -252,10 +257,13 @@ def register_estinzione(app) -> None:
             dbc.Alert([html.I(className="bi bi-info-circle-fill me-2"), verdict_txt],
                       color=verdict_color, className="mb-3"),
             dbc.Row([
-                dbc.Col(dcc.Graph(figure=cf_fig, config={"displayModeBar": False}), md=12),
+                dbc.Col(dcc.Graph(figure=cf_fig, config={
+                        "displayModeBar": False}), md=12),
             ]),
             dbc.Row([
-                dbc.Col(dcc.Graph(figure=cum_fig,  config={"displayModeBar": False}), md=6),
-                dbc.Col(dcc.Graph(figure=sens_fig, config={"displayModeBar": False}), md=6),
+                dbc.Col(dcc.Graph(figure=cum_fig,  config={
+                        "displayModeBar": False}), md=6),
+                dbc.Col(dcc.Graph(figure=sens_fig, config={
+                        "displayModeBar": False}), md=6),
             ], className="mt-3"),
         ])
