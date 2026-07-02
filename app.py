@@ -29,7 +29,7 @@ dash_app = dash.Dash(
         "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap",
     ],
     suppress_callback_exceptions=True,
-    title="Calcolatore Mutuo 🏠",
+    title="Simulatore acquisto con Mutuo per rendita 🏠",
 )
 
 # Exposed WSGI application (Gunicorn / Vercel)
@@ -59,7 +59,7 @@ dash_app.layout = dbc.Container(
                                 ),
                                 html.Div(
                                     [
-                                        html.H2("Calcolatore Mutuo", className="mb-1"),
+                                        html.H2("Simulatore acquisto con Mutuo per rendita", className="mb-1"),
                                         html.P(
                                             "Analisi completa per l'acquisto di un immobile in Italia",
                                             className="app-subtitle",

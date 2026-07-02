@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import dash_bootstrap_components as dbc
-from dash import Output, html, dash_table
+from dash import Output, Input, html, dash_table
 
 from core.finance import pmt, build_costs
 from core.solvers import (
@@ -22,11 +22,14 @@ def register_inverse(app) -> None:
     @app.callback(
         Output("tab-inverse-content", "children"),
         *SIDEBAR_INPUTS,
+        Input("spotlight-budget", "value"),
+        Input("spotlight-pct-ref", "value"),
     )
     def update_inverse(
         offerta, anticipo, durata, tasso, tipo, rendita,
         mediatore, notaio, perizia, ass_inc, ass_vita,
         donaz_cost, kiron_pct, med_pct,
+        spotlight_budget, spotlight_pct_ref,
     ):
         tasso_r = _safe(tasso, 3.2) / 100
         rendita = _safe(rendita, 206.58)
@@ -87,23 +90,28 @@ def register_inverse(app) -> None:
             style_table={"overflowX": "auto"},
         )
 
-        # ── Spotlight: €50 k cash, 20 % anticipo ──────────────────────────
-        home_q = inv_home_from_budget(50_000, 0.20, **cost_kw)
+        # ── Spotlight: configurable budget & anticipo % ───────────────────
+        budget_q = _safe(spotlight_budget, 50_000)
+        pct_q = _safe(spotlight_pct_ref, 20) / 100
+        home_q = inv_home_from_budget(budget_q, pct_q, **cost_kw)
         if home_q:
             items_q, _ = build_costs(
-                home_q, home_q * 0.20, rendita, tipo, bool(mediatore),
+                home_q, home_q * pct_q, rendita, tipo, bool(mediatore),
                 notaio, perizia, ass_inc, ass_vita, donaz_cost, kiron_pct, med_pct,
             )
-            monthly_q = pmt(home_q * 0.80, tasso_r, durata)
+            monthly_q = pmt(home_q * (1 - pct_q), tasso_r, durata)
             spotlight = dbc.Alert([
-                html.H5("🎯 Con €50.000 cash e anticipo 20%", className="alert-heading fw-bold"),
+                html.H5(
+                    f"🎯 Con {fe(budget_q)} cash e anticipo {fp(pct_q, 0)}",
+                    className="alert-heading fw-bold",
+                ),
                 html.Hr(),
                 dbc.Row([
                     dbc.Col([
                         html.H3(fe(home_q), className="text-success fw-bold"),
                         html.P("Valore massimo dell'immobile"),
-                        html.P([html.Strong("Anticipo: "), fe(home_q * 0.20)]),
-                        html.P([html.Strong("Mutuo: "), fe(home_q * 0.80)]),
+                        html.P([html.Strong("Anticipo: "), fe(home_q * pct_q)]),
+                        html.P([html.Strong("Mutuo: "), fe(home_q * (1 - pct_q))]),
                         html.P([html.Strong("Rata mensile: "), fe(monthly_q, 2), " / mese"]),
                     ], md=6),
                     dbc.Col([

@@ -124,7 +124,7 @@ def build_sidebar() -> dbc.Card:
                         ]),
                     ]), className="border-0"),
                     id="adv-collapse",
-                    is_open=False,
+                    is_open=True,
                 ),
             ]),
         ],

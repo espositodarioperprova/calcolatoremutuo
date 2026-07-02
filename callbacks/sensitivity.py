@@ -37,7 +37,7 @@ def register_sensitivity(app) -> None:
         mutuo = max(offerta - anticipo, 0)
 
         # ── 1. Heatmap: monthly payment = f(rate, duration) ───────────────
-        rates = np.linspace(0.01, 0.08, 20)
+        rates = np.linspace(0.026, 0.046, 21)
         durations = list(range(10, 36, 1))
         heat = np.array([[pmt(mutuo, r, d) for r in rates] for d in durations])
 
