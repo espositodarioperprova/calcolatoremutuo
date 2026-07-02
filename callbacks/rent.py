@@ -76,7 +76,7 @@ def register_rent(app) -> None:
                         dbc.Col([
                             dbc.Label("Affitto mensile lordo (\u20ac)"),
                             dbc.Input(id="affitto", type="number",
-                                      value=default_affitto, min=0, step=50),
+                                      value=default_affitto, min=0, step=1),
                             dbc.FormText(
                                 "Canone da contratto, prima di vacancy e imposte. Il lordo entra in tutte le metriche di rendimento."),
                         ]),
@@ -145,36 +145,9 @@ def register_rent(app) -> None:
                         ]),
                     ], className="mb-2"),
 
-                    dbc.Row([
-                        dbc.Col([
-                            dbc.Label("Vacancy rate (% tempo sfitto)"),
-                            dbc.InputGroup([
-                                dbc.Input(id="vacancy-pct", type="number",
-                                          value=5, min=0, max=100, step=1),
-                                dbc.InputGroupText("%"),
-                            ]),
-                            dbc.FormText(
-                                "5% ≈ 18 gg sfitti/anno. Riduce l'affitto lordo in tutti i calcoli e non è fiscalmente deducibile."),
-                        ]),
-                        dbc.Col([
-                            dbc.Label("Spese fisse annue (\u20ac)"),
-                            dbc.Input(id="spese-fisse", type="number",
-                                      value=1800, min=0, step=100),
-                            dbc.FormText(
-                                "Condominio, TARI, gestione, assicurazione"),
-                        ]),
-                    ], className="mb-2"),
+
 
                     dbc.Row([
-                        dbc.Col([
-                            dbc.Label("Manutenzione ordinaria (%/anno)"),
-                            dbc.InputGroup([
-                                dbc.Input(id="manutenzione-ord-pct", type="number",
-                                          value=0.5, min=0, max=5, step=0.1),
-                                dbc.InputGroupText("%"),
-                            ]),
-                            dbc.FormText("~0.5\u20131% del valore/anno"),
-                        ]),
                         dbc.Col([
                             dbc.Label("Manutenzione straordinaria"),
                             dbc.InputGroup([
@@ -279,26 +252,23 @@ def register_rent(app) -> None:
                                               className="small"),
                                     dbc.InputGroup([
                                         dbc.Input(id="canone-step-years", type="number",
-                                                  value=2, min=1, max=10, step=1,
+                                                  value=5, min=1, max=10, step=1,
                                                   disabled=True),
                                         dbc.InputGroupText("anni"),
                                     ]),
-                                    dbc.FormText(
-                                        "Libero: 2 \u00b7 Concordato: 4"),
                                 ]),
                             ]),
                         ], className="py-2"),
                     ], className="mb-3 border", style={"borderRadius": "8px"}),
 
-                    html.Div(id="investment-results"),
                 ], md=5),
 
-                # ── Right: waterfall chart ─────────────────────────────────
-                dbc.Col(
+                # ── Right: waterfall chart + results ────────────────────────────
+                dbc.Col([
                     dcc.Graph(id="waterfall-chart",
                               config={"displayModeBar": False}),
-                    md=7,
-                ),
+                    html.Div(id="investment-results"),
+                ], md=7),
             ]),
 
             dbc.Row([
@@ -336,9 +306,6 @@ def register_rent(app) -> None:
         Input("regime-tassazione",     "value"),
         Input("discount",              "value"),
         Input("inflaz",                "value"),
-        Input("vacancy-pct",           "value"),
-        Input("spese-fisse",           "value"),
-        Input("manutenzione-ord-pct",  "value"),
         Input("manutenzione-freq",     "value"),
         Input("manutenzione-costo",    "value"),
         Input("imu-rate",              "value"),
@@ -352,8 +319,8 @@ def register_rent(app) -> None:
         Input("rent-store",            "data"),
     )
     def update_investment(
-        affitto, regime, discount, inflaz, vacancy_pct, spese_fisse,
-        maint_ord_pct, maint_freq, maint_costo, imu_rate_input,
+        affitto, regime, discount, inflaz,
+        maint_freq, maint_costo, imu_rate_input,
         costo_vendita_pct,
         anno_uscita,
         canone_disallacciato, canone_growth_pct, canone_step_years,
@@ -381,9 +348,9 @@ def register_rent(app) -> None:
         tax_r = _TAX.get(regime or "cs21", _TAX["cs21"])
         discount_r = _safe(discount, 5) / 100
         inflaz_r = _safe(inflaz, 2) / 100
-        vacancy_r = _safe(vacancy_pct, 5) / 100
-        spese_fisse_ann = _safe(spese_fisse, 1800)
-        maint_ord_r = _safe(maint_ord_pct, 0.5) / 100
+        vacancy_r = 0.0
+        spese_fisse_ann = 0.0
+        maint_ord_r = 0.0
         maint_freq_v = _safe(maint_freq, 0.2)
         maint_costo_v = _safe(maint_costo, 3000)
         imu_r = _safe(imu_rate_input, 0.0 if tipo == "prima" else 0.96) / 100
@@ -495,11 +462,9 @@ def register_rent(app) -> None:
                      + net_terminal / (1 + r_disc_m) ** n_months_T)
 
         # ── Chart 1: Waterfall ─────────────────────────────────────────────
-        wf_x = ["Affitto lordo", "Vacancy",
-                "Imposte", "Manutenzione", "Spese fisse"]
-        wf_y = [affitto_lordo, -vacancy_drag, -tax_mensile,
-                -(maint_ord_mens + maint_ext_mens), -spese_fisse_mens]
-        wf_m = ["absolute", "relative", "relative", "relative", "relative"]
+        wf_x = ["Affitto lordo", "Imposte", "Manutenzione str."]
+        wf_y = [affitto_lordo, -tax_mensile, -maint_ext_mens]
+        wf_m = ["absolute", "relative", "relative"]
 
         if imu_mens > 0.01:
             wf_x.append("IMU")
@@ -527,7 +492,7 @@ def register_rent(app) -> None:
         ))
         waterfall_fig.update_layout(
             title=f"Cashflow mensile (anno\u00a01) \u2014 Affitto lordo {fe(affitto_lordo, 0)}/mese",
-            height=420, margin=dict(t=50, b=40, l=50, r=20), showlegend=False,
+            height=300, margin=dict(t=50, b=40, l=50, r=20), showlegend=False,
         )
 
         # ── Chart 2: Cumulative P&L ────────────────────────────────────────
@@ -593,11 +558,11 @@ def register_rent(app) -> None:
 
         # ── Chart 4: IRR vs rent level — consistent with hero IRR ──────────────────
         # Pre-compute time-invariant arrays so the per-rent loop is fast.
-        _m_arr    = np.arange(1, n_months_T + 1)
-        _ops_arr  = costi_op_base * (1 + r_inf_m) ** (_m_arr - 1)
+        _m_arr = np.arange(1, n_months_T + 1)
+        _ops_arr = costi_op_base * (1 + r_inf_m) ** (_m_arr - 1)
         _mort_arr = np.where(_m_arr <= durata_months, monthly_pmt_val, 0.0)
         if canone_disallacciato:
-            _yr0_arr    = (_m_arr - 1) // 12
+            _yr0_arr = (_m_arr - 1) // 12
             _nsteps_arr = _yr0_arr // step_yrs
             _growth_arr = (1 + canone_growth_ann) ** (_nsteps_arr * step_yrs)
         else:
@@ -607,7 +572,7 @@ def register_rent(app) -> None:
             max(affitto_lordo * 0.5, 200), affitto_lordo * 2, 25)
         irr_range = []
         for rent in rent_range:
-            _eff   = rent * (1 - vacancy_r)
+            _eff = rent * (1 - vacancy_r)
             _cfs_r = _eff * _growth_arr * (1 - tax_r) - _mort_arr - _ops_arr
 
             def _npv_r(r_m: float, _c: np.ndarray = _cfs_r) -> float:
@@ -728,18 +693,12 @@ def register_rent(app) -> None:
 
         table_rows = [
             ("Affitto lordo mensile",          fe(affitto_lordo, 2)),
-            ("Perdita da vacancy",
-             f"\u2212 {fe(vacancy_drag, 2)}"),
             ("Imposte sul canone",
              f"\u2212 {fe(tax_mensile, 2)}"),
-            ("Manutenzione ord. mensile",
-             f"\u2212 {fe(maint_ord_mens, 2)}"),
             ("Manutenzione straord. mensile",
              f"\u2212 {fe(maint_ext_mens, 2)}"),
             ("Ricerca inquilino (mensil.)",
              f"\u2212 {fe(ricerca_mens, 2)}"),
-            ("Spese fisse mensili",
-             f"\u2212 {fe(spese_fisse_mens, 2)}"),
             ("IMU mensile",                     f"\u2212 {fe(imu_mens, 2)}"),
             ("Rata mutuo",
              f"\u2212 {fe(monthly_pmt_val, 2)}"),
