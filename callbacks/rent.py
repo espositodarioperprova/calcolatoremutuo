@@ -54,7 +54,7 @@ def register_rent(app) -> None:
         mutuo = max(offerta - anticipo, 0)
         monthly_pmt_v = pmt(mutuo, tasso_r, durata)
 
-        default_affitto = max(round(offerta * 0.004 / 50) * 50, 300)
+        default_affitto = max(int(offerta * 0.0054 / 10) * 10, 300)
         default_imu = 0.0 if tipo in ("prima", "prima_donaz") else 0.96
         imu_default_ann = rendita_v * 1.05 * 160 * default_imu / 100
         if imu_default_ann > 0:
@@ -92,7 +92,7 @@ def register_rent(app) -> None:
                                     {"label": "43% \u2014 IRPEF (ultimo)",
                                      "value": "irpef43"},
                                 ],
-                                value="cs21", className="form-select",
+                                value="cc10", className="form-select",
                             ),
                         ]),
                     ], className="mb-1"),
