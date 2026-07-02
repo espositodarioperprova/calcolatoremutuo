@@ -31,8 +31,8 @@ def register_inverse(app) -> None:
         offerta, anticipo, durata, tasso, tipo, rendita,
         mediatore, notaio, perizia, ass_inc, ass_vita,
         donaz_cost, kiron_pct, med_pct,
-        spotlight_budget, spotlight_pct_ref,
         ass_inc_on, ass_vita_on, donaz_on, kiron_on,
+        spotlight_budget, spotlight_pct_ref,
     ):
         tasso_r = _safe(tasso, 3.2) / 100
         rendita = _safe(rendita, 206.58)

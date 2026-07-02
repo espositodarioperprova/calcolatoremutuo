@@ -77,7 +77,8 @@ def register_rent(app) -> None:
                             dbc.Label("Affitto mensile lordo (\u20ac)"),
                             dbc.Input(id="affitto", type="number",
                                       value=default_affitto, min=0, step=50),
-                            dbc.FormText("Canone da contratto, prima di vacancy e imposte. Il lordo entra in tutte le metriche di rendimento."),
+                            dbc.FormText(
+                                "Canone da contratto, prima di vacancy e imposte. Il lordo entra in tutte le metriche di rendimento."),
                         ]),
                         dbc.Col([
                             dbc.Label("Regime fiscale locazione"),
@@ -95,7 +96,8 @@ def register_rent(app) -> None:
                                 ],
                                 value="cs21", className="form-select",
                             ),
-                            dbc.FormText("Cedolare secca 21% è la scelta più comune per il libero mercato. Concordato al 10% solo con comune convenzionato."),
+                            dbc.FormText(
+                                "Cedolare secca 21% è la scelta più comune per il libero mercato. Concordato al 10% solo con comune convenzionato."),
                         ]),
                     ], className="mb-2"),
 
@@ -128,7 +130,8 @@ def register_rent(app) -> None:
                                           value=5.0, min=0, max=30, step=0.1),
                                 dbc.InputGroupText("%"),
                             ]),
-                            dbc.FormText("Se IRR > sconto → investimento crea valore vs benchmark. Usato nel calcolo del NPV."),
+                            dbc.FormText(
+                                "Se IRR > sconto → investimento crea valore vs benchmark. Usato nel calcolo del NPV."),
                         ]),
                         dbc.Col([
                             dbc.Label("Rivalutazione immobile (%/anno)"),
@@ -137,7 +140,8 @@ def register_rent(app) -> None:
                                           value=2.0, min=0, max=20, step=0.1),
                                 dbc.InputGroupText("%"),
                             ]),
-                            dbc.FormText("Incide sul valore terminale e indicizza i costi operativi. Storico ISTAT abitativo: ~2–3%/anno."),
+                            dbc.FormText(
+                                "Incide sul valore terminale e indicizza i costi operativi. Storico ISTAT abitativo: ~2–3%/anno."),
                         ]),
                     ], className="mb-2"),
 
@@ -149,7 +153,8 @@ def register_rent(app) -> None:
                                           value=5, min=0, max=100, step=1),
                                 dbc.InputGroupText("%"),
                             ]),
-                            dbc.FormText("5% ≈ 18 gg sfitti/anno. Riduce l'affitto lordo in tutti i calcoli e non è fiscalmente deducibile."),
+                            dbc.FormText(
+                                "5% ≈ 18 gg sfitti/anno. Riduce l'affitto lordo in tutti i calcoli e non è fiscalmente deducibile."),
                         ]),
                         dbc.Col([
                             dbc.Label("Spese fisse annue (\u20ac)"),
@@ -586,20 +591,31 @@ def register_rent(app) -> None:
             height=380, margin=dict(t=50, b=40, l=60, r=20),
         )
 
-        # ── Chart 4: IRR vs rent level ─────────────────────────────────────
+        # ── Chart 4: IRR vs rent level — consistent with hero IRR ──────────────────
+        # Pre-compute time-invariant arrays so the per-rent loop is fast.
+        _m_arr    = np.arange(1, n_months_T + 1)
+        _ops_arr  = costi_op_base * (1 + r_inf_m) ** (_m_arr - 1)
+        _mort_arr = np.where(_m_arr <= durata_months, monthly_pmt_val, 0.0)
+        if canone_disallacciato:
+            _yr0_arr    = (_m_arr - 1) // 12
+            _nsteps_arr = _yr0_arr // step_yrs
+            _growth_arr = (1 + canone_growth_ann) ** (_nsteps_arr * step_yrs)
+        else:
+            _growth_arr = (1 + r_inf_m) ** (_m_arr - 1)
+
         rent_range = np.linspace(
             max(affitto_lordo * 0.5, 200), affitto_lordo * 2, 25)
         irr_range = []
         for rent in rent_range:
-            cf1 = rent * (1 - vacancy_r) * (1 - tax_r) - \
-                monthly_pmt_val - costi_op_base
+            _eff   = rent * (1 - vacancy_r)
+            _cfs_r = _eff * _growth_arr * (1 - tax_r) - _mort_arr - _ops_arr
 
-            def _npv_r(r_m: float) -> float:
+            def _npv_r(r_m: float, _c: np.ndarray = _cfs_r) -> float:
                 if r_m <= -1.0:
                     return float("inf")
-                dv2 = (1 + r_m) ** np.arange(1, n_months_T + 1)
+                dv2 = (1 + r_m) ** _m_arr
                 return (-costo_iniziale
-                        + cf1 * float(np.sum(1.0 / dv2))
+                        + float(np.sum(_c / dv2))
                         + net_terminal / (1 + r_m) ** n_months_T)
             try:
                 rm = brentq(_npv_r, -0.09 / 12, 0.5 / 12, maxiter=200)

@@ -49,10 +49,17 @@ def register_risultati(app) -> None:
         prima = tipo in ("prima", "prima_donaz")
         ltv = mutuo / offerta * 100 if offerta > 0 else 0
 
-        if prima:
-            deductible_annual = min(mutuo * tasso, 4_000)
+        # Compute schedule early — used for capped IRPEF benefit and charts
+        amort_df = amortization_schedule(mutuo, tasso, durata)
+
+        if prima and not amort_df.empty:
+            _ann_int = amort_df.groupby("Anno")["Interessi (€)"].sum()
+            deductible_annual = min(float(_ann_int.iloc[0]), 4_000)
             tax_benefit_annual = deductible_annual * 0.19
-            tax_benefit_total = total_interest * 0.19
+            # art. 15 TUIR: cap €4 000/anno su interessi passivi detraibili
+            tax_benefit_total = float(
+                sum(min(yi, 4_000) * 0.19 for yi in _ann_int)
+            )
         else:
             tax_benefit_annual = tax_benefit_total = 0.0
 
@@ -66,7 +73,7 @@ def register_risultati(app) -> None:
                 items["TOTALE INIZIALE"]), "tutto incluso", "warning", "💰"), md=3),
             dbc.Col(kpi_card(
                 "Interessi totali", fe(total_interest),
-                f"Risparmio fiscale ~{fe(tax_benefit_total, 0)}" if prima else "Nessuna detrazione",
+                f"Risparmio fiscale {fe(tax_benefit_total, 0)}" if prima else "Nessuna detrazione",
                 "secondary", "📈",
             ), md=3),
         ], className="mb-4")
@@ -117,7 +124,6 @@ def register_risultati(app) -> None:
         ], className="mb-4")
 
         # ── Amortization annual summary ────────────────────────────────────
-        amort_df = amortization_schedule(mutuo, tasso, durata)
         if not amort_df.empty:
             annual = amort_df.groupby("Anno").agg(
                 Interessi=("Interessi (€)", "sum"),
@@ -154,7 +160,7 @@ def register_risultati(app) -> None:
                             html.Td(fe(total_interest))]),
                     html.Tr([html.Td("Valore catastale"), html.Td(fe(val_cat))]),
                     *([] if not prima else [
-                        html.Tr([html.Td("Detrazione fiscale annua (stimata)"),
+                        html.Tr([html.Td("Detrazione fiscale anno 1 (art. 15 TUIR)"),
                                  html.Td(fe(tax_benefit_annual, 0), className="text-success fw-bold")]),
                         html.Tr([html.Td("≈ Risparmio IRPEF mensile"),
                                  html.Td(fe(tax_benefit_annual / 12, 0), className="text-success")]),

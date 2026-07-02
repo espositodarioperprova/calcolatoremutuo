@@ -16,14 +16,20 @@ def pmt(principal: float, annual_rate: float, years: int) -> float:
     return principal * r * (1 + r) ** n / ((1 + r) ** n - 1)
 
 
-def valore_catastale(rendita: float, prima_casa: bool) -> float:
+def valore_catastale(rendita: float, prima_casa: bool, imu: bool = False) -> float:
     """
     Valore catastale = rendita catastale × 1.05 × coefficiente.
 
-    Prima casa : coeff 110 (imposta di registro 2 %).
-    Non prima  : coeff 126 (imposta di registro 9 %).
+    imu=False (default) — base per imposta di registro (DPR 131/1986):
+        Prima casa  : coeff 110, aliquota 2 %
+        Non prima   : coeff 120, aliquota 9 %
+
+    imu=True — base per IMU (D.L. 201/2011 art. 13):
+        Categoria A residenziale (A/2–A/7, A/11) : coeff 160
     """
-    return rendita * 1.05 * (110 if prima_casa else 126)
+    if imu:
+        return rendita * 1.05 * 160
+    return rendita * 1.05 * (110 if prima_casa else 120)
 
 
 def build_costs(
