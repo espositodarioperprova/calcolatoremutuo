@@ -13,7 +13,8 @@ Run locally::
 
 import dash
 import dash_bootstrap_components as dbc
-from dash import html
+from dash import dcc, html, Input, Output
+import requests as _req
 
 from ui.theme import apply_theme
 from ui.sidebar import build_sidebar
@@ -41,6 +42,7 @@ apply_theme()
 # ── Layout ────────────────────────────────────────────────────────────────────
 dash_app.layout = dbc.Container(
     [
+        dcc.Location(id="_url", refresh=False),
         dbc.Row(
             dbc.Col(
                 html.Div(
@@ -88,6 +90,8 @@ dash_app.layout = dbc.Container(
                 "© 2025 ",
                 html.Strong("Dario Esposito"),
                 " · Calcolatore Mutuo per Rendita · Tutti i diritti riservati",
+                html.Span(" · ", style={"color": "#cbd5e1"}),
+                html.Span(id="visit-counter"),
             ]),
             className="text-center text-muted py-3 mt-2",
             style={"borderTop": "1px solid #e2e8f0", "fontSize": "0.72rem",
@@ -100,6 +104,23 @@ dash_app.layout = dbc.Container(
 
 # ── Callbacks ─────────────────────────────────────────────────────────────────
 register_all_callbacks(dash_app)
+
+
+@dash_app.callback(
+    Output("visit-counter", "children"),
+    Input("_url", "pathname"),
+)
+def _count_visit(_):
+    """Increment CounterAPI on every page load and display the total."""
+    try:
+        r = _req.get(
+            "https://api.counterapi.dev/v1/darioesposito/calcolatoremutuo/up",
+            timeout=2,
+        )
+        n = r.json().get("count")
+        return f"{n:,} visite" if isinstance(n, int) else ""
+    except Exception:
+        return ""
 
 # ── Vercel / Gunicorn WSGI entrypoint ─────────────────────────────────────────
 # Vercel's @vercel/python builder looks for a top-level variable named 'app'
