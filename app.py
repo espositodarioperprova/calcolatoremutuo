@@ -87,7 +87,7 @@ dash_app.layout = dbc.Container(
         ),
         html.Footer(
             html.Small([
-                "© 2025 ",
+                "© 2026 ",
                 html.Strong("Dario Esposito"),
                 " · Calcolatore Mutuo per Rendita · Tutti i diritti riservati",
                 html.Span(" · ", style={"color": "#cbd5e1"}),
