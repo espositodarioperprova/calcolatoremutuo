@@ -200,7 +200,7 @@ def register_rent(app) -> None:
                                 dbc.Input(id="anno-uscita", type="number",
                                           value=None,
                                           placeholder=f"default: {int(durata)}",
-                                          min=1, max=60, step=1),
+                                          min=1, max=999, step=1),
                                 dbc.InputGroupText("a"),
                             ], size="sm"),
                         ], xs=6, md=4),
