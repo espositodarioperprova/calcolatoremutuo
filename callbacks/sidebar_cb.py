@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from dash import Input, Output, State, ctx, html
 
+from utils.i18n import t
+
 
 def register_sidebar_callbacks(app) -> None:
     @app.callback(
@@ -78,6 +80,72 @@ def register_sidebar_callbacks(app) -> None:
     )
     def disable_donaz_cost(on):
         return not bool(on)
+
+    # ── Translate sidebar labels on language change ────────────────────────
+    @app.callback(
+        Output("sb-hdr", "children"),
+        Output("sb-lbl-offerta", "children"),
+        Output("sb-ft-offerta", "children"),
+        Output("sb-lbl-anticipo", "children"),
+        Output("sb-lbl-durata", "children"),
+        Output("sb-lbl-tasso", "children"),
+        Output("sb-lbl-tipo", "children"),
+        Output("tipo", "options"),
+        Output("sb-ft-tipo", "children"),
+        Output("sb-lbl-rendita", "children"),
+        Output("sb-ft-rendita", "children"),
+        Output("mediatore", "label"),
+        Output("sb-adv-toggle-txt", "children"),
+        Output("sb-lbl-notaio", "children"),
+        Output("sb-ft-notaio", "children"),
+        Output("sb-lbl-perizia", "children"),
+        Output("sb-ft-perizia", "children"),
+        Output("sb-lbl-ass-inc", "children"),
+        Output("sb-ft-ass-inc", "children"),
+        Output("sb-lbl-ass-vita", "children"),
+        Output("sb-ft-ass-vita", "children"),
+        Output("sb-lbl-donaz", "children"),
+        Output("sb-ft-donaz", "children"),
+        Output("sb-lbl-kiron", "children"),
+        Output("sb-ft-kiron", "children"),
+        Output("sb-lbl-med-pct", "children"),
+        Output("sb-ft-med-pct", "children"),
+        Input("lang-store", "data"),
+    )
+    def translate_sidebar(lang):
+        return (
+            t("sidebar.header", lang),
+            t("sidebar.offerta.label", lang),
+            t("sidebar.offerta.help", lang),
+            t("sidebar.anticipo.label", lang),
+            t("sidebar.durata.label", lang),
+            t("sidebar.tasso.label", lang),
+            t("sidebar.tipo.label", lang),
+            [
+                {"label": t("sidebar.tipo.prima", lang), "value": "prima"},
+                {"label": t("sidebar.tipo.prima_donaz", lang), "value": "prima_donaz"},
+                {"label": t("sidebar.tipo.seconda", lang), "value": "seconda"},
+            ],
+            t("sidebar.tipo.help", lang),
+            t("sidebar.rendita.label", lang),
+            t("sidebar.rendita.help", lang),
+            t("sidebar.mediatore.label", lang),
+            t("sidebar.adv_toggle", lang),
+            t("sidebar.notaio.label", lang),
+            t("sidebar.notaio.help", lang),
+            t("sidebar.perizia.label", lang),
+            t("sidebar.perizia.help", lang),
+            t("sidebar.ass_inc.label", lang),
+            t("sidebar.ass_inc.help", lang),
+            t("sidebar.ass_vita.label", lang),
+            t("sidebar.ass_vita.help", lang),
+            t("sidebar.donaz.label", lang),
+            t("sidebar.donaz.help", lang),
+            t("sidebar.kiron.label", lang),
+            t("sidebar.kiron.help", lang),
+            t("sidebar.med_pct.label", lang),
+            t("sidebar.med_pct.help", lang),
+        )
 
     @app.callback(
         Output("kiron-pct", "disabled"),
