@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import numpy as np
 
+from utils.i18n import t  # noqa: F401 — re-exported for convenience
+
 
 def fe(v, dec: int = 0) -> str:
     """Format *v* as a euro string, e.g. ``€ 1.234,00``."""

@@ -44,6 +44,7 @@ dash_app.layout = dbc.Container(
     [
         dcc.Location(id="_url", refresh=False),
         dcc.Store(id="theme-store", storage_type="local", data="light"),
+        dcc.Store(id="lang-store", storage_type="local", data="it"),
         dbc.Row(
             dbc.Col(
                 html.Div(
@@ -75,22 +76,44 @@ dash_app.layout = dbc.Container(
                             ],
                             className="d-flex align-items-center",
                         ),
-                        html.Button(
-                            html.I(id="theme-icon", className="bi bi-moon-stars-fill"),
-                            id="theme-toggle",
-                            n_clicks=0,
-                            title="Attiva/disattiva dark mode",
+                        html.Div(
+                            [
+                                html.Button(
+                                    html.Span(id="lang-flag", children="EN"),
+                                    id="lang-toggle",
+                                    n_clicks=0,
+                                    title="Cambia lingua / Switch language",
+                                    style={
+                                        "background": "rgba(255,255,255,0.15)",
+                                        "border": "1px solid rgba(255,255,255,0.3)",
+                                        "borderRadius": "10px",
+                                        "color": "rgba(255,255,255,0.9)",
+                                        "padding": "0.45rem 0.75rem",
+                                        "fontSize": "1.05rem",
+                                        "cursor": "pointer",
+                                        "transition": "background 0.2s",
+                                    },
+                                ),
+                                html.Button(
+                                    html.I(id="theme-icon", className="bi bi-moon-stars-fill"),
+                                    id="theme-toggle",
+                                    n_clicks=0,
+                                    title="Attiva/disattiva dark mode",
+                                    style={
+                                        "background": "rgba(255,255,255,0.15)",
+                                        "border": "1px solid rgba(255,255,255,0.3)",
+                                        "borderRadius": "10px",
+                                        "color": "rgba(255,255,255,0.9)",
+                                        "padding": "0.45rem 0.75rem",
+                                        "fontSize": "1.05rem",
+                                        "cursor": "pointer",
+                                        "transition": "background 0.2s",
+                                    },
+                                ),
+                            ],
                             style={
                                 "position": "absolute", "top": "1rem", "right": "1rem",
-                                "background": "rgba(255,255,255,0.15)",
-                                "border": "1px solid rgba(255,255,255,0.3)",
-                                "borderRadius": "10px",
-                                "color": "rgba(255,255,255,0.9)",
-                                "padding": "0.45rem 0.75rem",
-                                "fontSize": "1.05rem",
-                                "cursor": "pointer",
-                                "zIndex": "10",
-                                "transition": "background 0.2s",
+                                "display": "flex", "gap": "0.5rem", "zIndex": "10",
                             },
                         ),
                     ],
@@ -141,6 +164,29 @@ def _count_visit(_):
     except Exception:
         return ""
 
+
+# ── Language toggle ──────────────────────────────────────────────────────────
+dash_app.clientside_callback(
+    """
+    function(n_clicks, pathname, stored) {
+        var triggered = window.dash_clientside.callback_context.triggered;
+        var lang;
+        if (triggered && triggered.length &&
+                triggered[0].prop_id === 'lang-toggle.n_clicks' && n_clicks) {
+            lang = (stored === 'en') ? 'it' : 'en';
+        } else {
+            lang = stored || 'it';
+        }
+        return [lang, lang === 'en' ? 'IT' : 'EN'];
+    }
+    """,
+    Output("lang-store", "data"),
+    Output("lang-flag", "children"),
+    Input("lang-toggle", "n_clicks"),
+    Input("_url", "pathname"),
+    State("lang-store", "data"),
+    prevent_initial_call=False,
+)
 
 # ── Dark mode toggle ──────────────────────────────────────────────────────────
 dash_app.clientside_callback(
