@@ -163,3 +163,48 @@ def register_sidebar_callbacks(app) -> None:
     def toggle_canone_params(disallacciato):
         disabled = not bool(disallacciato)
         return disabled, disabled
+
+    # ── Translate tab labels and static tab content on language change ──────
+    @app.callback(
+        Output("tab-btn-risultati", "label"),
+        Output("tab-btn-rent", "label"),
+        Output("tab-btn-inverse", "label"),
+        Output("tab-btn-amort", "label"),
+        Output("tab-btn-sensitivity", "label"),
+        Output("tab-btn-estinzione", "label"),
+        Output("tab-btn-metodologia", "label"),
+        Output("tabs-inv-budget-hdr", "children"),
+        Output("tabs-inv-budget-cash", "children"),
+        Output("tabs-inv-pct-ref", "children"),
+        Output("tabs-est-hdr", "children"),
+        Output("tabs-est-anno", "children"),
+        Output("tabs-est-anno-ft", "children"),
+        Output("tabs-est-r-alt", "children"),
+        Output("tabs-est-r-alt-ft", "children"),
+        Output("tabs-est-detr", "children"),
+        Output("applica-detraibilita", "label"),
+        Output("tabs-est-detr-ft", "children"),
+        Input("lang-store", "data"),
+    )
+    def translate_tabs(lang):
+        return (
+            t("tabs.risultati", lang),
+            t("tabs.rent", lang),
+            t("tabs.inverse", lang),
+            t("tabs.amort", lang),
+            t("tabs.sensitivity", lang),
+            t("tabs.estinzione", lang),
+            t("tabs.metodologia", lang),
+            t("tabs.inverse.budget_header", lang),
+            t("tabs.inverse.budget_cash.label", lang),
+            t("tabs.inverse.pct_ref.label", lang),
+            t("tabs.estinzione.header", lang),
+            t("tabs.estinzione.anno.label", lang),
+            t("tabs.estinzione.anno.help", lang),
+            t("tabs.estinzione.r_alt.label", lang),
+            t("tabs.estinzione.r_alt.help", lang),
+            t("tabs.estinzione.detr.label", lang),
+            t("tabs.estinzione.detr.switch", lang),
+            t("tabs.estinzione.detr.help", lang),
+        )
+

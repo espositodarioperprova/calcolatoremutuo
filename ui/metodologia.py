@@ -605,6 +605,7 @@ def _sec_estinzione() -> dbc.AccordionItem:
 def build_metodologia_tab() -> dbc.Tab:
     """Return the fully static '📚 Metodi e Formule' tab."""
     return dbc.Tab(
+        id="tab-btn-metodologia",
         label="📚 Metodi e Formule",
         tab_id="tab-metodologia",
         children=html.Div([

@@ -12,17 +12,20 @@ def build_tabs() -> dbc.Tabs:
     return dbc.Tabs(
         [
             dbc.Tab(
+                id="tab-btn-risultati",
                 label="📊 Overview sul Mutuo",
                 tab_id="tab-risultati",
                 children=html.Div(id="tab-risultati-content",
                                   className="pt-3"),
             ),
             dbc.Tab(
+                id="tab-btn-rent",
                 label="📈 Valutazione Investimento",
                 tab_id="tab-rent",
                 children=html.Div(id="tab-rent-content", className="pt-3"),
             ),
             dbc.Tab(
+                id="tab-btn-inverse",
                 label="💡 Cosa Posso Permettermi?",
                 tab_id="tab-inverse",
                 children=html.Div([
@@ -31,7 +34,7 @@ def build_tabs() -> dbc.Tabs:
                         dbc.CardHeader(
                             html.H6(
                                 [html.I(className="bi bi-sliders me-2"),
-                                 "Budget di riferimento personalizzabile"],
+                                 html.Span(id="tabs-inv-budget-hdr", children="Budget di riferimento personalizzabile")],
                                 className="mb-0 fw-bold",
                             ),
                         ),
@@ -39,7 +42,7 @@ def build_tabs() -> dbc.Tabs:
                             dbc.Row([
                                 dbc.Col([
                                     dbc.Label("Budget cash disponibile (€)",
-                                              className="small fw-semibold"),
+                                              id="tabs-inv-budget-cash", className="small fw-semibold"),
                                     dbc.Input(
                                         id="spotlight-budget",
                                         type="number",
@@ -50,7 +53,7 @@ def build_tabs() -> dbc.Tabs:
                                 ], xs=12, sm=6),
                                 dbc.Col([
                                     dbc.Label("% Anticipo di riferimento",
-                                              className="small fw-semibold"),
+                                              id="tabs-inv-pct-ref", className="small fw-semibold"),
                                     dbc.InputGroup([
                                         dbc.Input(
                                             id="spotlight-pct-ref",
@@ -70,17 +73,20 @@ def build_tabs() -> dbc.Tabs:
                 ]),
             ),
             dbc.Tab(
+                id="tab-btn-amort",
                 label="📅 Piano di Ammortamento",
                 tab_id="tab-amort",
                 children=html.Div(id="tab-amort-content", className="pt-3"),
             ),
             dbc.Tab(
+                id="tab-btn-sensitivity",
                 label="🔍 Analisi di Sensibilità",
                 tab_id="tab-sensitivity",
                 children=html.Div(
                     id="tab-sensitivity-content", className="pt-3"),
             ),
             dbc.Tab(
+                id="tab-btn-estinzione",
                 label="📐 Estinzione Anticipata",
                 tab_id="tab-estinzione",
                 children=html.Div([
@@ -89,7 +95,7 @@ def build_tabs() -> dbc.Tabs:
                         dbc.CardHeader(
                             html.H6(
                                 [html.I(className="bi bi-calculator me-2"),
-                                 "Parametri estinzione anticipata"],
+                                 html.Span(id="tabs-est-hdr", children="Parametri estinzione anticipata")],
                                 className="mb-0 fw-bold",
                             ),
                         ),
@@ -97,7 +103,7 @@ def build_tabs() -> dbc.Tabs:
                             dbc.Row([
                                 dbc.Col([
                                     dbc.Label("Anno di estinzione",
-                                              className="small fw-semibold"),
+                                              id="tabs-est-anno", className="small fw-semibold"),
                                     dbc.InputGroup([
                                         dbc.Input(
                                             id="anno-estinzione",
@@ -109,11 +115,12 @@ def build_tabs() -> dbc.Tabs:
                                         dbc.InputGroupText("anni"),
                                     ]),
                                     dbc.FormText(
-                                        "Anno in cui estingui il mutuo residuo"),
+                                        "Anno in cui estingui il mutuo residuo",
+                                        id="tabs-est-anno-ft"),
                                 ], xs=12, sm=4),
                                 dbc.Col([
                                     dbc.Label("Rendimento investimento alternativo",
-                                              className="small fw-semibold"),
+                                              id="tabs-est-r-alt", className="small fw-semibold"),
                                     dbc.InputGroup([
                                         dbc.Input(
                                             id="r-alt",
@@ -124,12 +131,13 @@ def build_tabs() -> dbc.Tabs:
                                         dbc.InputGroupText("%"),
                                     ]),
                                     dbc.FormText(
-                                        "Tasso che otterresti investendo il saldo residuo altrove"
+                                        "Tasso che otterresti investendo il saldo residuo altrove",
+                                        id="tabs-est-r-alt-ft"
                                     ),
                                 ], xs=12, sm=4),
                                 dbc.Col([
                                     dbc.Label("Detraibilità interessi",
-                                              className="small fw-semibold"),
+                                              id="tabs-est-detr", className="small fw-semibold"),
                                     dbc.Switch(
                                         id="applica-detraibilita",
                                         label="Applica 19% detraibilità (prima casa)",
@@ -137,7 +145,8 @@ def build_tabs() -> dbc.Tabs:
                                         className="mt-1",
                                     ),
                                     dbc.FormText(
-                                        "Riduce il tasso effettivo del mutuo (max €4 000/anno)"
+                                        "Riduce il tasso effettivo del mutuo (max €4 000/anno)",
+                                        id="tabs-est-detr-ft"
                                     ),
                                 ], xs=12, sm=4),
                             ]),
