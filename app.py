@@ -13,7 +13,7 @@ Run locally::
 
 import dash
 import dash_bootstrap_components as dbc
-from dash import dcc, html, Input, Output
+from dash import dcc, html, Input, Output, State
 import requests as _req
 
 from ui.theme import apply_theme
@@ -43,6 +43,7 @@ apply_theme()
 dash_app.layout = dbc.Container(
     [
         dcc.Location(id="_url", refresh=False),
+        dcc.Store(id="theme-store", storage_type="local", data="light"),
         dbc.Row(
             dbc.Col(
                 html.Div(
@@ -73,6 +74,24 @@ dash_app.layout = dbc.Container(
                                 ),
                             ],
                             className="d-flex align-items-center",
+                        ),
+                        html.Button(
+                            html.I(id="theme-icon", className="bi bi-moon-stars-fill"),
+                            id="theme-toggle",
+                            n_clicks=0,
+                            title="Attiva/disattiva dark mode",
+                            style={
+                                "position": "absolute", "top": "1rem", "right": "1rem",
+                                "background": "rgba(255,255,255,0.15)",
+                                "border": "1px solid rgba(255,255,255,0.3)",
+                                "borderRadius": "10px",
+                                "color": "rgba(255,255,255,0.9)",
+                                "padding": "0.45rem 0.75rem",
+                                "fontSize": "1.05rem",
+                                "cursor": "pointer",
+                                "zIndex": "10",
+                                "transition": "background 0.2s",
+                            },
                         ),
                     ],
                     className="app-header",
@@ -121,6 +140,31 @@ def _count_visit(_):
         return f"{n:,} visite" if isinstance(n, int) else ""
     except Exception:
         return ""
+
+
+# ── Dark mode toggle ──────────────────────────────────────────────────────────
+dash_app.clientside_callback(
+    """
+    function(n_clicks, pathname, stored) {
+        var triggered = window.dash_clientside.callback_context.triggered;
+        var theme;
+        if (triggered && triggered.length &&
+                triggered[0].prop_id === 'theme-toggle.n_clicks' && n_clicks) {
+            theme = (stored === 'dark') ? 'light' : 'dark';
+        } else {
+            theme = stored || 'light';
+        }
+        document.documentElement.setAttribute('data-bs-theme', theme);
+        return [theme, theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill'];
+    }
+    """,
+    Output("theme-store", "data"),
+    Output("theme-icon", "className"),
+    Input("theme-toggle", "n_clicks"),
+    Input("_url", "pathname"),
+    State("theme-store", "data"),
+    prevent_initial_call=False,
+)
 
 # ── Vercel / Gunicorn WSGI entrypoint ─────────────────────────────────────────
 # Vercel's @vercel/python builder looks for a top-level variable named 'app'

@@ -23,8 +23,8 @@ def apply_theme() -> None:
     """
     pio.templates["_cal"] = go.layout.Template(
         layout=go.Layout(
-            paper_bgcolor="white",
-            plot_bgcolor="#f8fafc",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
             font_family="Inter, -apple-system, BlinkMacSystemFont, sans-serif",
             font_color="#374151",
             font_size=12,
