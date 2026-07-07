@@ -3,10 +3,11 @@ from __future__ import annotations
 
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
-from dash import Output, dcc, html, dash_table
+from dash import Input, Output, dcc, html, dash_table
 
 from core.finance import pmt, build_costs, amortization_schedule
 from utils import fe, fp
+from utils.i18n import t
 from ui.components import kpi_card
 from ui.theme import PALETTE
 from .shared import SIDEBAR_INPUTS, _safe
@@ -16,12 +17,14 @@ def register_risultati(app) -> None:
     @app.callback(
         Output("tab-risultati-content", "children"),
         *SIDEBAR_INPUTS,
+        Input("lang-store", "data"),
     )
     def update_risultati(
         offerta, anticipo, durata, tasso, tipo, rendita,
         mediatore, notaio, perizia, ass_inc, ass_vita,
         donaz_cost, kiron_pct, med_pct,
         ass_inc_on, ass_vita_on, donaz_on, kiron_on,
+        lang,
     ):
         offerta = _safe(offerta, 100_000)
         anticipo = _safe(anticipo, 20_000)
@@ -65,15 +68,15 @@ def register_risultati(app) -> None:
 
         # ── KPI row ────────────────────────────────────────────────────────
         kpi_row = dbc.Row([
-            dbc.Col(kpi_card("Mutuo", fe(mutuo),
+            dbc.Col(kpi_card(t("risultati.kpi.mutuo", lang), fe(mutuo),
                     f"LTV {ltv:.1f}%", "primary", "🏦"), md=3),
-            dbc.Col(kpi_card("Rata mensile", fe(monthly, 2),
-                    f"per {durata} anni", "danger", "📆"), md=3),
-            dbc.Col(kpi_card("Costo totale iniziale", fe(
-                items["TOTALE INIZIALE"]), "tutto incluso", "warning", "💰"), md=3),
+            dbc.Col(kpi_card(t("risultati.kpi.rata", lang), fe(monthly, 2),
+                    t("risultati.kpi.per_anni", lang).format(durata=durata), "danger", "📆"), md=3),
+            dbc.Col(kpi_card(t("risultati.kpi.costo_iniziale", lang), fe(
+                items["TOTALE INIZIALE"]), t("risultati.kpi.tutto_incluso", lang), "warning", "💰"), md=3),
             dbc.Col(kpi_card(
-                "Interessi totali", fe(total_interest),
-                f"Risparmio fiscale {fe(tax_benefit_total, 0)}" if prima else "Nessuna detrazione",
+                t("risultati.kpi.interessi_totali", lang), fe(total_interest),
+                t("risultati.kpi.risparmio_fiscale", lang).format(amount=fe(tax_benefit_total, 0)) if prima else t("risultati.kpi.nessuna_detrazione", lang),
                 "secondary", "📈",
             ), md=3),
         ], className="mb-4")
@@ -99,13 +102,13 @@ def register_risultati(app) -> None:
         ))
         pie_fig.update_layout(
             showlegend=False, margin=dict(t=30, b=10, l=10, r=10),
-            height=380, title_text="Composizione costi iniziali", title_x=0.5,
+            height=380, title_text=t("risultati.chart.costi_title", lang), title_x=0.5,
         )
 
         cost_table = dash_table.DataTable(
             data=rows_table,
-            columns=[{"name": "Voce", "id": "Voce"}, {
-                "name": "Importo", "id": "Importo"}],
+            columns=[{"name": t("risultati.table.voce", lang), "id": "Voce"}, {
+                "name": t("risultati.table.importo", lang), "id": "Importo"}],
             style_cell={"textAlign": "left",
                         "padding": "8px", "fontFamily": "inherit"},
             style_header={"fontWeight": "bold", "backgroundColor": "#f8fafc"},
@@ -117,7 +120,7 @@ def register_risultati(app) -> None:
         )
 
         breakdown_row = dbc.Row([
-            dbc.Col([html.H5("Dettaglio costi iniziali",
+            dbc.Col([html.H5(t("risultati.section.dettaglio_costi", lang),
                     className="fw-bold mb-3"), cost_table], md=6),
             dbc.Col(dcc.Graph(figure=pie_fig, config={
                     "displayModeBar": False}), md=6),
@@ -131,12 +134,12 @@ def register_risultati(app) -> None:
             ).reset_index()
             area_fig = go.Figure()
             area_fig.add_trace(go.Bar(x=annual["Anno"], y=annual["Interessi"],
-                                      name="Interessi", marker_color="#ef4444"))
+                                      name=t("risultati.chart.interessi", lang), marker_color="#ef4444"))
             area_fig.add_trace(go.Bar(x=annual["Anno"], y=annual["Capitale"],
-                                      name="Capitale", marker_color="#10b981"))
+                                      name=t("risultati.chart.capitale", lang), marker_color="#10b981"))
             area_fig.update_layout(
-                barmode="stack", title="Composizione rata anno per anno",
-                xaxis_title="Anno", yaxis_title="€", height=320,
+                barmode="stack", title=t("risultati.chart.bar_title", lang),
+                xaxis_title=t("risultati.chart.anno", lang), yaxis_title="€", height=320,
                 margin=dict(t=40, b=40, l=40, r=10),
                 legend=dict(orientation="h", y=1.1),
             )
@@ -145,24 +148,24 @@ def register_risultati(app) -> None:
 
         mortgage_info = dbc.Row([
             dbc.Col([
-                html.H5("Riepilogo mutuo", className="fw-bold mb-3"),
+                html.H5(t("risultati.section.riepilogo", lang), className="fw-bold mb-3"),
                 dbc.Table(html.Tbody([
-                    html.Tr([html.Td("Importo mutuo"), html.Td(
+                    html.Tr([html.Td(t("risultati.table.importo_mutuo", lang)), html.Td(
                         fe(mutuo), className="fw-bold")]),
-                    html.Tr([html.Td("Tasso annuo"), html.Td(fp(tasso))]),
-                    html.Tr([html.Td("Durata"), html.Td(
-                        f"{durata} anni ({durata * 12} rate)")]),
-                    html.Tr([html.Td("Rata mensile"), html.Td(
+                    html.Tr([html.Td(t("risultati.table.tasso", lang)), html.Td(fp(tasso))]),
+                    html.Tr([html.Td(t("risultati.table.durata_label", lang)), html.Td(
+                        t("risultati.table.durata_val", lang).format(durata=durata, rate=durata * 12))]),
+                    html.Tr([html.Td(t("risultati.table.rata", lang)), html.Td(
                         fe(monthly, 2), className="fw-bold text-danger")]),
-                    html.Tr([html.Td("Totale pagato"),
+                    html.Tr([html.Td(t("risultati.table.totale_pagato", lang)),
                             html.Td(fe(total_paid))]),
-                    html.Tr([html.Td("di cui interessi passivi"),
+                    html.Tr([html.Td(t("risultati.table.di_cui_interessi", lang)),
                             html.Td(fe(total_interest))]),
-                    html.Tr([html.Td("Valore catastale"), html.Td(fe(val_cat))]),
+                    html.Tr([html.Td(t("risultati.table.valore_cat", lang)), html.Td(fe(val_cat))]),
                     *([] if not prima else [
-                        html.Tr([html.Td("Detrazione fiscale anno 1 (art. 15 TUIR)"),
+                        html.Tr([html.Td(t("risultati.table.detrazione_ann1", lang)),
                                  html.Td(fe(tax_benefit_annual, 0), className="text-success fw-bold")]),
-                        html.Tr([html.Td("≈ Risparmio IRPEF mensile"),
+                        html.Tr([html.Td(t("risultati.table.risparmio_irpef", lang)),
                                  html.Td(fe(tax_benefit_annual / 12, 0), className="text-success")]),
                     ]),
                 ]), bordered=True, hover=True, size="sm"),

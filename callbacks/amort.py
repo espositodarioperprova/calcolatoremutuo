@@ -3,9 +3,10 @@ from __future__ import annotations
 
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
-from dash import Output, dcc, html, dash_table
+from dash import Input, Output, dcc, html, dash_table
 
 from core.finance import amortization_schedule
+from utils.i18n import t
 from .shared import SIDEBAR_INPUTS, _safe
 
 
@@ -13,12 +14,14 @@ def register_amort(app) -> None:
     @app.callback(
         Output("tab-amort-content", "children"),
         *SIDEBAR_INPUTS,
+        Input("lang-store", "data"),
     )
     def update_amort(
         offerta, anticipo, durata, tasso, tipo, rendita,
         mediatore, notaio, perizia, ass_inc, ass_vita,
         donaz_cost, kiron_pct, med_pct,
         ass_inc_on, ass_vita_on, donaz_on, kiron_on,
+        lang,
     ):
         offerta = _safe(offerta, 100_000)
         anticipo = _safe(anticipo, 20_000)
@@ -28,7 +31,7 @@ def register_amort(app) -> None:
         mutuo = max(offerta - anticipo, 0)
         df = amortization_schedule(mutuo, tasso_r, durata)
         if df.empty:
-            return dbc.Alert("Parametri non validi.", color="warning")
+            return dbc.Alert(t("amort.invalid", lang), color="warning")
 
         # Annual summary table
         annual = (
@@ -45,19 +48,29 @@ def register_amort(app) -> None:
             "Anno", "Rate totali (\u20ac)", "Interessi (\u20ac)",
             "Capitale (\u20ac)", "Saldo a fine anno (\u20ac)",
         ]
+        _col = {
+            "Anno": t("amort.col.anno", lang),
+            "Rate totali (\u20ac)": t("amort.col.rata_totale", lang),
+            "Interessi (\u20ac)": t("amort.col.interessi_euro", lang),
+            "Capitale (\u20ac)": t("amort.col.capitale_euro", lang),
+            "Saldo a fine anno (\u20ac)": t("amort.col.saldo_fine", lang),
+            "Mese": t("amort.col.mese", lang),
+            "Rata (\u20ac)": t("amort.col.rata_euro", lang),
+            "Saldo residuo (\u20ac)": t("amort.col.saldo_residuo", lang),
+        }
         annual = annual.round(2)
 
         # Residual balance chart
         balance_fig = go.Figure()
         balance_fig.add_trace(go.Scatter(
             x=df["Mese"] / 12, y=df["Saldo residuo (\u20ac)"],
-            mode="lines", name="Saldo residuo",
+            mode="lines", name=t("amort.chart.balance_series", lang),
             line=dict(color="#ef4444", width=2),
             fill="tozeroy", fillcolor="rgba(239,68,68,0.12)",
         ))
         balance_fig.update_layout(
-            title="Saldo residuo del mutuo nel tempo",
-            xaxis_title="Anno", yaxis_title="\u20ac",
+            title=t("amort.chart.balance_title", lang),
+            xaxis_title=t("amort.chart.anno", lang), yaxis_title="\u20ac",
             height=280, margin=dict(t=50, b=40, l=50, r=20),
         )
 
@@ -65,26 +78,26 @@ def register_amort(app) -> None:
         ic_fig = go.Figure()
         ic_fig.add_trace(go.Scatter(
             x=df["Mese"] / 12, y=df["Interessi (\u20ac)"],
-            mode="lines", name="Interessi",
+            mode="lines", name=t("amort.chart.interessi", lang),
             line=dict(color="#ef4444"),
             fill="tozeroy", fillcolor="rgba(239,68,68,0.22)",
         ))
         ic_fig.add_trace(go.Scatter(
             x=df["Mese"] / 12, y=df["Capitale (\u20ac)"],
-            mode="lines", name="Capitale",
+            mode="lines", name=t("amort.chart.capitale", lang),
             line=dict(color="#10b981"),
             fill="tozeroy", fillcolor="rgba(16,185,129,0.22)",
         ))
         ic_fig.update_layout(
-            title="Quota interessi vs quota capitale per rata",
-            xaxis_title="Anno", yaxis_title="\u20ac",
+            title=t("amort.chart.ic_title", lang),
+            xaxis_title=t("amort.chart.anno", lang), yaxis_title="\u20ac",
             height=280, margin=dict(t=50, b=40, l=50, r=20),
             legend=dict(orientation="h", y=1.1),
         )
 
         annual_table = dash_table.DataTable(
             data=annual.to_dict("records"),
-            columns=[{"name": c, "id": c} for c in annual.columns],
+            columns=[{"name": _col.get(c, c), "id": c} for c in annual.columns],
             style_cell={"textAlign": "right",
                         "padding": "6px 10px", "fontFamily": "inherit"},
             style_cell_conditional=[
@@ -99,7 +112,7 @@ def register_amort(app) -> None:
 
         monthly_table = dash_table.DataTable(
             data=df.to_dict("records"),
-            columns=[{"name": c, "id": c} for c in df.columns],
+            columns=[{"name": _col.get(c, c), "id": c} for c in df.columns],
             style_cell={
                 "textAlign": "right", "padding": "5px 8px",
                 "fontFamily": "inherit", "fontSize": "0.85rem",
@@ -122,8 +135,8 @@ def register_amort(app) -> None:
                 dbc.Col(dcc.Graph(figure=ic_fig, config={
                         "displayModeBar": False}), md=6),
             ], className="mb-4"),
-            html.H5("Riepilogo annuale", className="fw-bold mb-2"),
+            html.H5(t("amort.section.annual", lang), className="fw-bold mb-2"),
             annual_table,
-            html.H5("Dettaglio mensile", className="fw-bold mb-2 mt-4"),
+            html.H5(t("amort.section.monthly", lang), className="fw-bold mb-2 mt-4"),
             monthly_table,
         ])
