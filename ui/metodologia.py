@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import dash_bootstrap_components as dbc
 from dash import dcc, html
+from utils.i18n import t
 
 # ── Reusable formula block style ─────────────────────────────────────────────
 _FORMULA = {
@@ -58,8 +59,8 @@ def _section(title: str, *children) -> dbc.AccordionItem:
 #  Section builders
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def _sec_pmt() -> dbc.AccordionItem:
-    return _section("1 · Rata mensile — Piano di ammortamento (PMT)",
+def _sec_pmt(lang: str = "it") -> dbc.AccordionItem:
+    return _section(t("met.s1.title", lang),
                     html.P([
                         "Il mutuo segue il ", html.Strong(
                             "piano di ammortamento alla francese"),
@@ -97,8 +98,8 @@ def _sec_pmt() -> dbc.AccordionItem:
                     )
 
 
-def _sec_costi() -> dbc.AccordionItem:
-    return _section("2 · Costi di acquisto — Imposte e spese accessorie",
+def _sec_costi(lang: str = "it") -> dbc.AccordionItem:
+    return _section(t("met.s2.title", lang),
                     html.P([
                         "Il ", html.Strong(
                             "Costo Iniziale Totale"), " C₀ include anticipo + "
@@ -176,8 +177,8 @@ def _sec_costi() -> dbc.AccordionItem:
                     )
 
 
-def _sec_imu() -> dbc.AccordionItem:
-    return _section("3 · IMU annuale",
+def _sec_imu(lang: str = "it") -> dbc.AccordionItem:
+    return _section(t("met.s3.title", lang),
                     html.P([
                         "L'", html.Strong("Imposta Municipale Propria"),
                         " (D.L. 201/2011, art. 13) è calcolata sulla rendita catastale rivalutata:",
@@ -215,8 +216,8 @@ def _sec_imu() -> dbc.AccordionItem:
                     )
 
 
-def _sec_cashflow() -> dbc.AccordionItem:
-    return _section("4 · Cashflow mensile operativo",
+def _sec_cashflow(lang: str = "it") -> dbc.AccordionItem:
+    return _section(t("met.s4.title", lang),
                     html.P("Il cashflow mensile netto si costruisce per sottrazione:",
                            className="small"),
                     html.Div(
@@ -269,8 +270,8 @@ def _sec_cashflow() -> dbc.AccordionItem:
                     )
 
 
-def _sec_canone() -> dbc.AccordionItem:
-    return _section("5 · Crescita del canone nel tempo",
+def _sec_canone(lang: str = "it") -> dbc.AccordionItem:
+    return _section(t("met.s5.title", lang),
                     html.P([
                         "La crescita del canone nel tempo si modella in due modalità:",
                     ], className="small"),
@@ -316,8 +317,8 @@ def _sec_canone() -> dbc.AccordionItem:
                     )
 
 
-def _sec_terminale() -> dbc.AccordionItem:
-    return _section("6 · Valore terminale e P&L cumulato",
+def _sec_terminale(lang: str = "it") -> dbc.AccordionItem:
+    return _section(t("met.s6.title", lang),
                     html.P([
                         "Al termine dell'orizzonte T (anno di uscita) si calcolano il ricavo di vendita "
                         "e il guadagno o perdita complessiva.",
@@ -364,8 +365,8 @@ def _sec_terminale() -> dbc.AccordionItem:
                     )
 
 
-def _sec_irr() -> dbc.AccordionItem:
-    return _section("7 · IRR — Tasso Interno di Rendimento",
+def _sec_irr(lang: str = "it") -> dbc.AccordionItem:
+    return _section(t("met.s7.title", lang),
                     html.P([
                         "L'IRR è il tasso mensile r* che rende il NPV dell'investimento uguale a zero:",
                     ], className="small"),
@@ -415,8 +416,8 @@ def _sec_irr() -> dbc.AccordionItem:
                     )
 
 
-def _sec_npv() -> dbc.AccordionItem:
-    return _section("8 · NPV — Valore Attuale Netto",
+def _sec_npv(lang: str = "it") -> dbc.AccordionItem:
+    return _section(t("met.s8.title", lang),
                     html.P([
                         "Il NPV attualizza tutti i flussi futuri al ", html.Strong(
                             "tasso di sconto"),
@@ -465,8 +466,8 @@ def _sec_npv() -> dbc.AccordionItem:
                     )
 
 
-def _sec_indicatori() -> dbc.AccordionItem:
-    return _section("9 · Indicatori di redditività",
+def _sec_indicatori(lang: str = "it") -> dbc.AccordionItem:
+    return _section(t("met.s9.title", lang),
                     html.P("Quattro indicatori misurano la redditività su assi diversi:",
                            className="small"),
                     dbc.Table([
@@ -531,8 +532,8 @@ def _sec_indicatori() -> dbc.AccordionItem:
                     )
 
 
-def _sec_estinzione() -> dbc.AccordionItem:
-    return _section("10 · Estinzione anticipata — logica del confronto",
+def _sec_estinzione(lang: str = "it") -> dbc.AccordionItem:
+    return _section(t("met.s10.title", lang),
                     html.P([
                         "Il tab ", html.Strong(
                             "Estinzione Anticipata"), " risponde alla domanda: ",
@@ -602,40 +603,43 @@ def _sec_estinzione() -> dbc.AccordionItem:
 #  Public builder
 # ═══════════════════════════════════════════════════════════════════════════════
 
+def build_metodologia_content(lang: str = "it") -> html.Div:
+    """Build the methodology tab content in the given language."""
+    return html.Div([
+        html.Div([
+            html.H4([html.I(className="bi bi-journal-text me-2"),
+                     t("met.h4", lang)],
+                    className="fw-bold mb-1"),
+            html.P(
+                t("met.intro", lang),
+                className="text-muted small mb-3",
+            ),
+        ], className="mt-3"),
+        dbc.Accordion(
+            [
+                _sec_pmt(lang),
+                _sec_costi(lang),
+                _sec_imu(lang),
+                _sec_cashflow(lang),
+                _sec_canone(lang),
+                _sec_terminale(lang),
+                _sec_irr(lang),
+                _sec_npv(lang),
+                _sec_indicatori(lang),
+                _sec_estinzione(lang),
+            ],
+            always_open=True,
+            start_collapsed=True,
+            className="mb-4",
+        ),
+    ])
+
+
 def build_metodologia_tab() -> dbc.Tab:
-    """Return the fully static '📚 Metodi e Formule' tab."""
+    """Return the '📚 Metodi e Formule' tab shell; content filled by callback."""
     return dbc.Tab(
         id="tab-btn-metodologia",
         label="📚 Metodi e Formule",
         tab_id="tab-metodologia",
-        children=html.Div([
-            html.Div([
-                html.H4([html.I(className="bi bi-journal-text me-2"),
-                         "Metodologia e Formule"],
-                        className="fw-bold mb-1"),
-                html.P(
-                    "Riferimento tecnico completo per tutti i calcoli eseguiti dall'applicazione. "
-                    "Apri le sezioni di interesse — ogni voce descrive la formula esatta, "
-                    "le variabili di input coinvolte e come interpretare il risultato.",
-                    className="text-muted small mb-3",
-                ),
-            ], className="mt-3"),
-            dbc.Accordion(
-                [
-                    _sec_pmt(),
-                    _sec_costi(),
-                    _sec_imu(),
-                    _sec_cashflow(),
-                    _sec_canone(),
-                    _sec_terminale(),
-                    _sec_irr(),
-                    _sec_npv(),
-                    _sec_indicatori(),
-                    _sec_estinzione(),
-                ],
-                always_open=True,
-                start_collapsed=True,
-                className="mb-4",
-            ),
-        ]),
+        children=html.Div(id="tab-metodologia-content"),
     )

@@ -362,6 +362,23 @@ _T: dict[str, dict[str, str]] = {
         "rent.tbl.npv": "NPV totale",
         "rent.tbl.breakeven": "Canone break-even",
         "rent.tbl.euro_mese": "\u20ac/mese",
+        # ── Methodology tab ────────────────────────────────────────────────────
+        "met.h4": "Metodologia e Formule",
+        "met.intro": (
+            "Riferimento tecnico completo per tutti i calcoli eseguiti dall'applicazione. "
+            "Apri le sezioni di interesse \u2014 ogni voce descrive la formula esatta, "
+            "le variabili di input coinvolte e come interpretare il risultato."
+        ),
+        "met.s1.title": "1 \u00b7 Rata mensile \u2014 Piano di ammortamento (PMT)",
+        "met.s2.title": "2 \u00b7 Costi di acquisto \u2014 Imposte e spese accessorie",
+        "met.s3.title": "3 \u00b7 IMU annuale",
+        "met.s4.title": "4 \u00b7 Cashflow mensile operativo",
+        "met.s5.title": "5 \u00b7 Crescita del canone nel tempo",
+        "met.s6.title": "6 \u00b7 Valore terminale e P&L cumulato",
+        "met.s7.title": "7 \u00b7 IRR \u2014 Tasso Interno di Rendimento",
+        "met.s8.title": "8 \u00b7 NPV \u2014 Valore Attuale Netto",
+        "met.s9.title": "9 \u00b7 Indicatori di redditivit\u00e0",
+        "met.s10.title": "10 \u00b7 Estinzione anticipata \u2014 logica del confronto",
     },
 
     # ── English ───────────────────────────────────────────────────────────────
@@ -706,6 +723,23 @@ _T: dict[str, dict[str, str]] = {
         "rent.tbl.npv": "Total NPV",
         "rent.tbl.breakeven": "Break-even rent",
         "rent.tbl.euro_mese": "\u20ac/month",
+        # ── Methodology tab ────────────────────────────────────────────────────
+        "met.h4": "Methodology & Formulas",
+        "met.intro": (
+            "Complete technical reference for all calculations performed by the application. "
+            "Open the sections of interest \u2014 each entry describes the exact formula, "
+            "the input variables involved and how to interpret the result."
+        ),
+        "met.s1.title": "1 \u00b7 Monthly payment \u2014 French amortisation (PMT)",
+        "met.s2.title": "2 \u00b7 Purchase costs \u2014 Taxes and ancillary expenses",
+        "met.s3.title": "3 \u00b7 Annual IMU property tax",
+        "met.s4.title": "4 \u00b7 Monthly operating cashflow",
+        "met.s5.title": "5 \u00b7 Rent growth over time",
+        "met.s6.title": "6 \u00b7 Terminal value & cumulative P&L",
+        "met.s7.title": "7 \u00b7 IRR \u2014 Internal Rate of Return",
+        "met.s8.title": "8 \u00b7 NPV \u2014 Net Present Value",
+        "met.s9.title": "9 \u00b7 Profitability indicators",
+        "met.s10.title": "10 \u00b7 Early repayment \u2014 comparison logic",
     },
 }
 

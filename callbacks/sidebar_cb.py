@@ -4,6 +4,7 @@ from __future__ import annotations
 from dash import Input, Output, State, ctx, html
 
 from utils.i18n import t
+from ui.metodologia import build_metodologia_content
 
 
 def register_sidebar_callbacks(app) -> None:
@@ -123,7 +124,8 @@ def register_sidebar_callbacks(app) -> None:
             t("sidebar.tipo.label", lang),
             [
                 {"label": t("sidebar.tipo.prima", lang), "value": "prima"},
-                {"label": t("sidebar.tipo.prima_donaz", lang), "value": "prima_donaz"},
+                {"label": t("sidebar.tipo.prima_donaz", lang),
+                 "value": "prima_donaz"},
                 {"label": t("sidebar.tipo.seconda", lang), "value": "seconda"},
             ],
             t("sidebar.tipo.help", lang),
@@ -208,3 +210,9 @@ def register_sidebar_callbacks(app) -> None:
             t("tabs.estinzione.detr.help", lang),
         )
 
+    @app.callback(
+        Output("tab-metodologia-content", "children"),
+        Input("lang-store", "data"),
+    )
+    def translate_metodologia_content(lang):
+        return build_metodologia_content(lang)
