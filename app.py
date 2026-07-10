@@ -64,9 +64,12 @@ dash_app.layout = dbc.Container(
                                 html.Div(
                                     [
                                         html.H2(
-                                            "Simulatore acquisto con Mutuo per rendita", className="mb-1"),
+                                            id="app-title",
+                             children="Simulatore acquisto con Mutuo per rendita \u2014 IN ITALIA",
+                             className="mb-1"),
                                         html.P(
-                                            "Analisi per l'acquisto di un immobile in Italia, a mezzo mutuo e con fini di rendita da locazione.",
+                                            id="app-subtitle",
+                                            children="Analisi per l'acquisto di un immobile in Italia, a mezzo mutuo e con fini di rendita da locazione.",
                                             className="app-subtitle",
                                         ),
                                     ],
@@ -95,7 +98,8 @@ dash_app.layout = dbc.Container(
                                     },
                                 ),
                                 html.Button(
-                                    html.I(id="theme-icon", className="bi bi-moon-stars-fill"),
+                                    html.I(id="theme-icon",
+                                           className="bi bi-moon-stars-fill"),
                                     id="theme-toggle",
                                     n_clicks=0,
                                     title="Attiva/disattiva dark mode",

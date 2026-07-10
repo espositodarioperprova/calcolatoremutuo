@@ -12,7 +12,7 @@ _T: dict[str, dict[str, str]] = {
     # ── Italian (default) ─────────────────────────────────────────────────────
     "it": {
         # ── App-level ──────────────────────────────────────────────────────────
-        "app.title": "Simulatore acquisto con Mutuo per rendita",
+        "app.title": "Simulatore acquisto con Mutuo per rendita \u2014 IN ITALIA",
         "app.subtitle": (
             "Analisi per l'acquisto di un immobile in Italia, a mezzo mutuo"
             " e con fini di rendita da locazione."
@@ -398,10 +398,10 @@ _T: dict[str, dict[str, str]] = {
     # ── English ───────────────────────────────────────────────────────────────
     "en": {
         # ── App-level ──────────────────────────────────────────────────────────
-        "app.title": "Mortgage Purchase Simulator for Rental Income",
+        "app.title": "Mortgage Purchase Simulator for Rental Income \u2014 in Italy",
         "app.subtitle": (
             "Analysis for purchasing a property in Italy via mortgage"
-            " for rental income purposes."
+            " for rental income purposes. Based on Italian law and taxation."
         ),
         "app.footer": "Mortgage Rental Calculator \u00b7 All rights reserved",
         "app.theme_toggle": "Toggle dark mode",

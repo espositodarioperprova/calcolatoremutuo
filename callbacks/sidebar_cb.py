@@ -216,3 +216,11 @@ def register_sidebar_callbacks(app) -> None:
     )
     def translate_metodologia_content(lang):
         return build_metodologia_content(lang)
+
+    @app.callback(
+        Output("app-title",    "children"),
+        Output("app-subtitle", "children"),
+        Input("lang-store", "data"),
+    )
+    def translate_header(lang):
+        return t("app.title", lang), t("app.subtitle", lang)
