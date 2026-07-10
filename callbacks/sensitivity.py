@@ -4,10 +4,11 @@ from __future__ import annotations
 import numpy as np
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
-from dash import Output, dcc, html
+from dash import Input, Output, dcc, html
 
 from core.finance import pmt, build_costs
 from utils import fe, fp
+from utils.i18n import t
 from .shared import SIDEBAR_INPUTS, _safe
 
 
@@ -15,12 +16,14 @@ def register_sensitivity(app) -> None:
     @app.callback(
         Output("tab-sensitivity-content", "children"),
         *SIDEBAR_INPUTS,
+        Input("lang-store", "data"),
     )
     def update_sensitivity(
         offerta, anticipo, durata, tasso, tipo, rendita,
         mediatore, notaio, perizia, ass_inc, ass_vita,
         donaz_cost, kiron_pct, med_pct,
         ass_inc_on, ass_vita_on, donaz_on, kiron_on,
+        lang,
     ):
         offerta = _safe(offerta, 100_000)
         anticipo = _safe(anticipo, 20_000)
@@ -50,11 +53,11 @@ def register_sensitivity(app) -> None:
             text=[[f"\u20ac{v:.0f}" for v in row] for row in heat],
             texttemplate="%{text}",
             textfont={"size": 9},
-            colorbar=dict(title="\u20ac/mese"),
+            colorbar=dict(title=t("sensitivity.colorbar", lang)),
         ))
         heatmap_fig.update_layout(
-            title=f"Rata mensile (\u20ac) — Mutuo {fe(mutuo)} · tasso \u00d7 durata",
-            xaxis_title="Tasso annuo", yaxis_title="Durata (anni)",
+            title=t("sensitivity.heatmap.title", lang).format(mutuo=fe(mutuo)),
+            xaxis_title=t("sensitivity.heatmap.xaxis", lang), yaxis_title=t("sensitivity.heatmap.yaxis", lang),
             height=420, margin=dict(t=50, b=50, l=60, r=20),
         )
 
@@ -70,11 +73,11 @@ def register_sensitivity(app) -> None:
         ))
         stress_fig.add_vline(
             x=tasso_ref * 100, line_dash="dash",
-            annotation_text=f"Attuale {fp(tasso_ref)}",
+            annotation_text=t("sensitivity.attuale", lang).format(val=fp(tasso_ref)),
         )
         stress_fig.update_layout(
-            title=f"Rata mensile al variare del tasso — Mutuo {fe(mutuo)}, {durata_ref} anni",
-            xaxis_title="Tasso annuo (%)", yaxis_title="Rata mensile (\u20ac)",
+            title=t("sensitivity.stress.title", lang).format(mutuo=fe(mutuo), durata=durata_ref),
+            xaxis_title=t("sensitivity.stress.xaxis", lang), yaxis_title=t("sensitivity.stress.yaxis", lang),
             height=300, margin=dict(t=50, b=40, l=50, r=20),
         )
 
@@ -96,11 +99,11 @@ def register_sensitivity(app) -> None:
         ))
         cost_fig.add_vline(
             x=offerta / 1000, line_dash="dash",
-            annotation_text=f"Attuale {fe(offerta, 0)}",
+            annotation_text=t("sensitivity.attuale", lang).format(val=fe(offerta, 0)),
         )
         cost_fig.update_layout(
-            title=f"Costo totale iniziale al variare del prezzo (anticipo {fp(pct_anti, 0)})",
-            xaxis_title="Prezzo immobile (k\u20ac)", yaxis_title="Costo totale iniziale (\u20ac)",
+            title=t("sensitivity.cost.title", lang).format(pct=fp(pct_anti, 0)),
+            xaxis_title=t("sensitivity.cost.xaxis", lang), yaxis_title=t("sensitivity.cost.yaxis", lang),
             height=300, margin=dict(t=50, b=40, l=50, r=20),
         )
 
@@ -120,23 +123,23 @@ def register_sensitivity(app) -> None:
         tradeoff_fig = go.Figure()
         tradeoff_fig.add_trace(go.Scatter(
             x=pcts_range * 100, y=initials, mode="lines",
-            name="Costo iniziale (\u20ac)", line=dict(color="#f59e0b", width=2),
+            name=t("sensitivity.tradeoff.y1", lang), line=dict(color="#f59e0b", width=2),
             yaxis="y",
         ))
         tradeoff_fig.add_trace(go.Scatter(
             x=pcts_range * 100, y=monthlies, mode="lines",
-            name="Rata mensile (\u20ac)", line=dict(color="#3b82f6", width=2),
+            name=t("sensitivity.tradeoff.y2", lang), line=dict(color="#3b82f6", width=2),
             yaxis="y2",
         ))
         tradeoff_fig.add_vline(
             x=pct_anti * 100, line_dash="dash",
-            annotation_text=f"Attuale {fp(pct_anti, 0)}",
+            annotation_text=t("sensitivity.attuale", lang).format(val=fp(pct_anti, 0)),
         )
         tradeoff_fig.update_layout(
-            title="Trade-off anticipo: costo iniziale \u2191 \u2192 rata mensile \u2193",
-            xaxis_title="% Anticipo",
-            yaxis=dict(title="Costo iniziale (\u20ac)", color="#f59e0b"),
-            yaxis2=dict(title="Rata mensile (\u20ac)", overlaying="y",
+            title=t("sensitivity.tradeoff.title", lang),
+            xaxis_title=t("sensitivity.tradeoff.xaxis", lang),
+            yaxis=dict(title=t("sensitivity.tradeoff.y1", lang), color="#f59e0b"),
+            yaxis2=dict(title=t("sensitivity.tradeoff.y2", lang), overlaying="y",
                         side="right", color="#3b82f6"),
             height=300, margin=dict(t=50, b=40, l=60, r=60),
             legend=dict(orientation="h", y=1.1),

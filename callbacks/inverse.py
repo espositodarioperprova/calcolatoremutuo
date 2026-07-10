@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import dash_bootstrap_components as dbc
 from dash import Output, Input, html, dash_table
+from utils.i18n import t
 
 from core.finance import pmt, build_costs
 from core.solvers import (
@@ -26,6 +27,7 @@ def register_inverse(app) -> None:
         *SIDEBAR_INPUTS,
         Input("spotlight-budget", "value"),
         Input("spotlight-pct-ref", "value"),
+        Input("lang-store", "data"),
     )
     def update_inverse(
         offerta, anticipo, durata, tasso, tipo, rendita,
@@ -33,6 +35,7 @@ def register_inverse(app) -> None:
         donaz_cost, kiron_pct, med_pct,
         ass_inc_on, ass_vita_on, donaz_on, kiron_on,
         spotlight_budget, spotlight_pct_ref,
+        lang,
     ):
         tasso_r = _safe(tasso, 3.2) / 100
         rendita = _safe(rendita, 206.58)
@@ -60,7 +63,7 @@ def register_inverse(app) -> None:
         pcts = [0.10, 0.15, 0.20, 0.25, 0.30]
         grid = []
         for p in pcts:
-            row = {"% Anticipo": fp(p, 0)}
+            row = {t("inverse.pct_anticipo", lang): fp(p, 0)}
             for b in budgets:
                 res = inv_home_from_budget(b, p, **cost_kw)
                 row[fe(b, 0)] = fe(res) if res else "—"
@@ -80,10 +83,10 @@ def register_inverse(app) -> None:
         pcts_b = [0.10, 0.20, 0.30]
         grid_b = []
         for p in pcts_b:
-            row = {"% Anticipo": fp(p, 0)}
+            row = {t("inverse.pct_anticipo", lang): fp(p, 0)}
             for pm in payments:
                 res_h, _ = inv_home_from_payment(pm, p, tasso_r, durata)
-                row[f"Rata \u2264 {fe(pm, 0)}"] = fe(res_h)
+                row[f'{t("inverse.rata_le", lang)} {fe(pm, 0)}'] = fe(res_h)
             grid_b.append(row)
 
         table_b = dash_table.DataTable(
@@ -114,15 +117,15 @@ def register_inverse(app) -> None:
                 dbc.Row([
                     dbc.Col([
                         html.H3(fe(home_q), className="text-success fw-bold"),
-                        html.P("Valore massimo dell'immobile"),
-                        html.P([html.Strong("Anticipo: "), fe(home_q * pct_q)]),
-                        html.P([html.Strong("Mutuo: "),
+                        html.P(t("inverse.spotlight.max_home", lang)),
+                        html.P([html.Strong(t("inverse.spotlight.anticipo", lang)), fe(home_q * pct_q)]),
+                        html.P([html.Strong(t("inverse.spotlight.mutuo", lang)),
                                fe(home_q * (1 - pct_q))]),
-                        html.P([html.Strong("Rata mensile: "),
-                               fe(monthly_q, 2), " / mese"]),
+                        html.P([html.Strong(t("inverse.spotlight.rata", lang)),
+                               fe(monthly_q, 2), t("inverse.spotlight.per_mese", lang)]),
                     ], md=6),
                     dbc.Col([
-                        html.H6("Come si distribuisce il budget:"),
+                        html.H6(t("inverse.spotlight.distrib", lang)),
                         dbc.Table(html.Tbody([
                             html.Tr([
                                 html.Td(k, className="small"),
@@ -135,7 +138,7 @@ def register_inverse(app) -> None:
             ], color="success")
         else:
             spotlight = dbc.Alert(
-                "Con questi parametri il budget non è sufficiente.", color="danger")
+                t("inverse.spotlight.no_budget", lang), color="danger")
 
         # ── C: duration needed ─────────────────────────────────────────────
         targets = [50_000, 100_000, 150_000, 200_000, 300_000, 500_000]
@@ -143,11 +146,11 @@ def register_inverse(app) -> None:
         grid_d = []
         for target in targets:
             mut = target * (1 - pct_anti)
-            row = {"Prezzo immobile": fe(target), "Mutuo": fe(mut)}
+            row = {t("inverse.duration.prezzo", lang): fe(target), t("inverse.duration.mutuo", lang): fe(mut)}
             for pm in pmts_d:
                 yrs = inv_duration_from_payment(pm, mut, tasso_r)
-                row[f"Rata \u2264 {fe(pm, 0)}"] = (
-                    f"{yrs} anni" if yrs and yrs <= 40 else "Imp."
+                row[f'{t("inverse.rata_le", lang)} {fe(pm, 0)}'] = (
+                    t("inverse.duration.anni", lang).format(yrs=yrs) if yrs and yrs <= 40 else t("inverse.duration.imp", lang)
                 )
             grid_d.append(row)
 
@@ -165,10 +168,10 @@ def register_inverse(app) -> None:
         mutui_e = [80_000, 120_000, 150_000, 200_000, 300_000]
         grid_e = []
         for pm in pmts_e:
-            row = {"Rata max": fe(pm, 0)}
+            row = {t("inverse.rate.rata_max", lang): fe(pm, 0)}
             for mut in mutui_e:
                 r = inv_max_rate(pm, mut, durata)
-                row[f"Mutuo {fe(mut, 0)}"] = fp(r) if r else "Imp."
+                row[f'{t("inverse.rate.mutuo_col", lang).format(val=fe(mut, 0))}'] = fp(r) if r else t("inverse.duration.imp", lang)
             grid_e.append(row)
 
         table_e = dash_table.DataTable(
@@ -182,31 +185,31 @@ def register_inverse(app) -> None:
 
         return html.Div([
             spotlight, html.Hr(),
-            html.H5("💶 A. Quanto posso comprare dato il mio budget cash?",
+            html.H5(t("inverse.sec_a.title", lang),
                     className="fw-bold mt-3 mb-1"),
             html.P(
-                f"Tasso {fp(tasso_r)} · Durata {durata} anni — ogni cella = prezzo max immobile acquistabile",
+                t("inverse.sec_a.hint", lang).format(rate=fp(tasso_r), durata=durata),
                 className="text-muted small mb-2",
             ),
             grid_table, html.Hr(),
-            html.H5("💳 B. Quanto posso comprare data la rata mensile massima?",
+            html.H5(t("inverse.sec_b.title", lang),
                     className="fw-bold mt-3 mb-1"),
             html.P(
-                f"Tasso {fp(tasso_r)} · Durata {durata} anni — ogni cella = prezzo max immobile",
+                t("inverse.sec_b.hint", lang).format(rate=fp(tasso_r), durata=durata),
                 className="text-muted small mb-2",
             ),
             table_b, html.Hr(),
-            html.H5("⏱️ C. Di quanti anni ho bisogno per sostenere una certa rata?",
+            html.H5(t("inverse.sec_c.title", lang),
                     className="fw-bold mt-3 mb-1"),
             html.P(
-                f"Tasso {fp(tasso_r)} · Anticipo {fp(pct_anti)} — ogni cella = durata minima in anni",
+                t("inverse.sec_c.hint", lang).format(rate=fp(tasso_r), pct=fp(pct_anti)),
                 className="text-muted small mb-2",
             ),
             table_d, html.Hr(),
-            html.H5("📉 D. Qual è il tasso massimo che posso sopportare?",
+            html.H5(t("inverse.sec_d.title", lang),
                     className="fw-bold mt-3 mb-1"),
             html.P(
-                f"Durata {durata} anni — ogni cella = tasso annuo massimo sostenibile",
+                t("inverse.sec_d.hint", lang).format(durata=durata),
                 className="text-muted small mb-2",
             ),
             table_e,
