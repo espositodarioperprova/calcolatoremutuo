@@ -380,17 +380,68 @@ h5.fw-bold { color: #1e293b; font-size: 0.97rem; }
 }
 
 /* Tables */
-[data-bs-theme="dark"] .table th {
+[data-bs-theme="dark"] .table {
+    --bs-table-bg: #1e293b;
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+[data-bs-theme="dark"] .table th,
+[data-bs-theme="dark"] .table thead th {
     background: #0f172a !important;
     color: #94a3b8 !important;
-    border-bottom-color: #334155 !important;
+    border-color: #334155 !important;
 }
 [data-bs-theme="dark"] .table td {
+    background-color: #1e293b !important;
     color: #cbd5e1 !important;
     border-color: #334155 !important;
 }
 [data-bs-theme="dark"] .table-hover tbody tr:hover td {
     background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Accordion (methodology tab) */
+[data-bs-theme="dark"] .accordion-item {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+}
+[data-bs-theme="dark"] .accordion-button {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+    box-shadow: none !important;
+}
+[data-bs-theme="dark"] .accordion-button:not(.collapsed) {
+    background-color: #0f172a !important;
+    color: #93c5fd !important;
+}
+[data-bs-theme="dark"] .accordion-button::after {
+    filter: invert(1) brightness(2);
+}
+[data-bs-theme="dark"] .accordion-body {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+}
+
+/* Dash DataTable */
+[data-bs-theme="dark"] .dash-spreadsheet-container .dash-header {
+    background-color: #0f172a !important;
+    color: #94a3b8 !important;
+    border-color: #334155 !important;
+}
+[data-bs-theme="dark"] .dash-spreadsheet-container .dash-cell {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+[data-bs-theme="dark"] .dash-spreadsheet-inner {
+    background-color: #1e293b !important;
+}
+[data-bs-theme="dark"] .dash-spreadsheet-container .Select-control,
+[data-bs-theme="dark"] .dash-spreadsheet-container .Select-value-label {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
 }
 
 /* Cards (generic) */

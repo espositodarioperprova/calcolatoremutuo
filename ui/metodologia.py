@@ -132,8 +132,8 @@ def _sec_costi(lang: str = "it") -> dbc.AccordionItem:
                     html.H6("Riepilogo voci di spesa", className="mt-2"),
                     dbc.Table([
                         html.Thead(html.Tr([
-                            html.Th("Voce"), html.Th(
-                                "Formula / Calcolo"), html.Th("Note"),
+                            html.Th(t("met.s2.th.voce", lang)), html.Th(
+                                t("met.s2.th.formula", lang)), html.Th(t("met.s2.th.note", lang)),
                         ])),
                         html.Tbody([
                             html.Tr([html.Td("Anticipo"), html.Td("inserito"),
@@ -235,8 +235,8 @@ def _sec_cashflow(lang: str = "it") -> dbc.AccordionItem:
                     html.H6("Regime fiscale", className="mt-2"),
                     dbc.Table([
                         html.Thead(html.Tr([
-                            html.Th("Regime"), html.Th(
-                                "Aliquota effettiva"), html.Th("Base imponibile"),
+                            html.Th(t("met.s4.th.regime", lang)), html.Th(
+                                t("met.s4.th.aliquota", lang)), html.Th(t("met.s4.th.base", lang)),
                         ])),
                         html.Tbody([
                             html.Tr([html.Td("Cedolare Secca (21%)"), html.Td("21%"),
@@ -388,7 +388,8 @@ def _sec_irr(lang: str = "it") -> dbc.AccordionItem:
                     html.H6("Interpretazione", className="mt-2"),
                     dbc.Table([
                         html.Thead(
-                            html.Tr([html.Th("Condizione"), html.Th("Significato")])),
+                            html.Tr([html.Th(t("met.s7.th.condizione", lang)), html.Th(t("met.s7.th.significato", lang))])),
+
                         html.Tbody([
                             html.Tr([html.Td("IRR > tasso di sconto"),
                                      html.Td("Investimento crea valore (NPV > 0) rispetto al benchmark")]),
@@ -437,8 +438,9 @@ def _sec_npv(lang: str = "it") -> dbc.AccordionItem:
                         "Più è alto, più il futuro vale meno in termini attuali.",
                     ], className="small"),
                     dbc.Table([
-                        html.Thead(html.Tr([html.Th("Benchmark comune"),
-                                            html.Th("Tasso di sconto consigliato")])),
+                        html.Thead(html.Tr([html.Th(t("met.s8.th.benchmark", lang)),
+                                            html.Th(t("met.s8.th.tasso", lang))])),
+
                         html.Tbody([
                             html.Tr(
                                 [html.Td("BTP decennale (risk-free italiano)"), html.Td("3.5%")]),
@@ -472,8 +474,8 @@ def _sec_indicatori(lang: str = "it") -> dbc.AccordionItem:
                            className="small"),
                     dbc.Table([
                         html.Thead(html.Tr([
-                            html.Th("Indicatore"), html.Th(
-                                "Formula"), html.Th("Cosa misura"),
+                            html.Th(t("met.s9.th.indicatore", lang)), html.Th(
+                                t("met.s9.th.formula", lang)), html.Th(t("met.s9.th.cosa", lang)),
                         ])),
                         html.Tbody([
                             html.Tr([

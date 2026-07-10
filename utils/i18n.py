@@ -379,6 +379,20 @@ _T: dict[str, dict[str, str]] = {
         "met.s8.title": "8 \u00b7 NPV \u2014 Valore Attuale Netto",
         "met.s9.title": "9 \u00b7 Indicatori di redditivit\u00e0",
         "met.s10.title": "10 \u00b7 Estinzione anticipata \u2014 logica del confronto",
+        # met table headers
+        "met.s2.th.voce": "Voce",
+        "met.s2.th.formula": "Formula / Calcolo",
+        "met.s2.th.note": "Note",
+        "met.s4.th.regime": "Regime",
+        "met.s4.th.aliquota": "Aliquota effettiva",
+        "met.s4.th.base": "Base imponibile",
+        "met.s7.th.condizione": "Condizione",
+        "met.s7.th.significato": "Significato",
+        "met.s8.th.benchmark": "Benchmark comune",
+        "met.s8.th.tasso": "Tasso di sconto consigliato",
+        "met.s9.th.indicatore": "Indicatore",
+        "met.s9.th.formula": "Formula",
+        "met.s9.th.cosa": "Cosa misura",
     },
 
     # ── English ───────────────────────────────────────────────────────────────
@@ -740,6 +754,20 @@ _T: dict[str, dict[str, str]] = {
         "met.s8.title": "8 \u00b7 NPV \u2014 Net Present Value",
         "met.s9.title": "9 \u00b7 Profitability indicators",
         "met.s10.title": "10 \u00b7 Early repayment \u2014 comparison logic",
+        # met table headers
+        "met.s2.th.voce": "Item",
+        "met.s2.th.formula": "Formula / Calculation",
+        "met.s2.th.note": "Notes",
+        "met.s4.th.regime": "Tax regime",
+        "met.s4.th.aliquota": "Effective rate",
+        "met.s4.th.base": "Tax base",
+        "met.s7.th.condizione": "Condition",
+        "met.s7.th.significato": "Meaning",
+        "met.s8.th.benchmark": "Common benchmark",
+        "met.s8.th.tasso": "Recommended discount rate",
+        "met.s9.th.indicatore": "Indicator",
+        "met.s9.th.formula": "Formula",
+        "met.s9.th.cosa": "What it measures",
     },
 }
 
