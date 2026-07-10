@@ -6,6 +6,7 @@ from scipy.optimize import brentq
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 from dash import Output, Input, dcc, html
+from utils.i18n import t
 
 from core.finance import pmt, build_costs
 from utils import fe, fp
@@ -25,12 +26,14 @@ def register_rent(app) -> None:
     @app.callback(
         Output("tab-rent-content", "children"),
         *SIDEBAR_INPUTS,
+        Input("lang-store", "data"),
     )
     def update_rent(
         offerta, anticipo, durata, tasso, tipo, rendita,
         mediatore, notaio, perizia, ass_inc, ass_vita,
         donaz_cost, kiron_pct, med_pct,
         ass_inc_on, ass_vita_on, donaz_on, kiron_on,
+        lang,
     ):
         offerta = _safe(offerta, 100_000)
         anticipo = _safe(anticipo, 20_000)
@@ -58,39 +61,34 @@ def register_rent(app) -> None:
         default_imu = 0.0 if tipo in ("prima", "prima_donaz") else 1.06
         imu_default_ann = rendita_v * 1.05 * 160 * default_imu / 100
         if imu_default_ann > 0:
-            imu_text = (
-                f"Rendita \u00d7 1.05 \u00d7 160 \u00d7 {default_imu:.2f}% \u2192 "
-                f"{fe(imu_default_ann, 0)}/anno \u00b7 {fe(imu_default_ann / 12, 1)}/mese"
+            imu_text = t("rent.imu.formula", lang).format(
+                aliq=default_imu, ann=fe(imu_default_ann, 0), mese=fe(imu_default_ann / 12, 1)
             )
         else:
-            imu_text = "Prima casa: esente da IMU (art. 13 c.2 D.L. 201/2011)"
+            imu_text = t("rent.imu.prima_casa", lang)
 
         return html.Div([
             dbc.Row([
                 # ── Left: inputs ──────────────────────────────────────────
                 dbc.Col([
-                    html.H5("Parametri investimento",
+                    html.H5(t("rent.lbl.section_header", lang),
                             className="fw-bold mb-2"),
 
                     dbc.Row([
                         dbc.Col([
-                            dbc.Label("Affitto mensile lordo (\u20ac)"),
+                            dbc.Label(t("rent.lbl.affitto", lang)),
                             dbc.Input(id="affitto", type="number",
                                       value=default_affitto, min=0, step=1),
                         ]),
                         dbc.Col([
-                            dbc.Label("Regime fiscale locazione"),
+                            dbc.Label(t("rent.lbl.regime", lang)),
                             dbc.Select(
                                 id="regime-tassazione",
                                 options=[
-                                    {"label": "10% \u2014 Canone Concordato",
-                                        "value": "cc10"},
-                                    {"label": "21% \u2014 Cedolare Secca",
-                                        "value": "cs21"},
-                                    {"label": "35% \u2014 IRPEF (penult.)",
-                                     "value": "irpef35"},
-                                    {"label": "43% \u2014 IRPEF (ultimo)",
-                                     "value": "irpef43"},
+                                    {"label": t("rent.opt.cc10", lang), "value": "cc10"},
+                                    {"label": t("rent.opt.cs21", lang), "value": "cs21"},
+                                    {"label": t("rent.opt.irpef35", lang), "value": "irpef35"},
+                                    {"label": t("rent.opt.irpef43", lang), "value": "irpef43"},
                                 ],
                                 value="cc10", className="form-select",
                             ),
@@ -100,23 +98,19 @@ def register_rent(app) -> None:
                     dbc.Row([
                         dbc.Col([
                             dbc.Label([
-                                "Tasso di sconto cashflow futuri (%)",
+                                t("rent.lbl.discount", lang),
                                 html.Span(" \u24d8", id="tooltip-discount-target",
                                           style={"cursor": "pointer", "color": "#64748b"}),
                             ]),
                             dbc.Tooltip(
                                 html.Div([
-                                    html.P(
-                                        "Costo opportunit\u00e0 del capitale.", className="fw-semibold mb-1"),
+                                    html.P(t("rent.tt.discount.title", lang), className="fw-semibold mb-1"),
                                     html.Ul([
-                                        html.Li(
-                                            "BTP decennale: ~3.5% (risk-free)"),
-                                        html.Li(
-                                            "Portafoglio bilanciato: ~5\u20136%"),
-                                        html.Li(
-                                            "Mercato azionario: ~7\u20138%"),
+                                        html.Li(t("rent.tt.discount.li1", lang)),
+                                        html.Li(t("rent.tt.discount.li2", lang)),
+                                        html.Li(t("rent.tt.discount.li3", lang)),
                                     ], className="mb-1 ps-3 small"),
-                                    html.P("Pi\u00f9 \u00e8 alto, pi\u00f9 penalizzi ritorni a lungo termine.",
+                                    html.P(t("rent.tt.discount.footer", lang),
                                            className="mb-0 small"),
                                 ]),
                                 target="tooltip-discount-target", placement="right",
@@ -128,7 +122,7 @@ def register_rent(app) -> None:
                             ]),
                         ]),
                         dbc.Col([
-                            dbc.Label("Rivalutazione immobile (%/anno)"),
+                            dbc.Label(t("rent.lbl.inflaz", lang)),
                             dbc.InputGroup([
                                 dbc.Input(id="inflaz", type="number",
                                           value=2.0, min=0, max=20, step=0.1),
@@ -142,7 +136,8 @@ def register_rent(app) -> None:
                     # ── 4-col: manutenzione + ricerca ─────────────────────
                     dbc.Row([
                         dbc.Col([
-                            dbc.Label("Mant. straord.", className="small fw-semibold"),
+                            dbc.Label(t("rent.lbl.mant_straord", lang),
+                                      className="small fw-semibold"),
                             dbc.InputGroup([
                                 dbc.Input(id="manutenzione-freq", type="number",
                                           value=0.2, min=0, max=5, step=0.05),
@@ -150,7 +145,8 @@ def register_rent(app) -> None:
                             ], size="sm"),
                         ], xs=6, md=3),
                         dbc.Col([
-                            dbc.Label("Costo evento", className="small fw-semibold"),
+                            dbc.Label(t("rent.lbl.costo_evento", lang),
+                                      className="small fw-semibold"),
                             dbc.InputGroup([
                                 dbc.Input(id="manutenzione-costo", type="number",
                                           value=3000, min=0, step=500),
@@ -158,7 +154,8 @@ def register_rent(app) -> None:
                             ], size="sm"),
                         ], xs=6, md=3),
                         dbc.Col([
-                            dbc.Label("Ricerca inq.", className="small fw-semibold"),
+                            dbc.Label(t("rent.lbl.ricerca_inq", lang),
+                                      className="small fw-semibold"),
                             dbc.InputGroup([
                                 dbc.Input(id="ricerca-costo", type="number",
                                           value=500, min=0, step=100),
@@ -166,7 +163,8 @@ def register_rent(app) -> None:
                             ], size="sm"),
                         ], xs=6, md=3),
                         dbc.Col([
-                            dbc.Label("Freq. ricerca", className="small fw-semibold"),
+                            dbc.Label(t("rent.lbl.freq_ricerca", lang),
+                                      className="small fw-semibold"),
                             dbc.InputGroup([
                                 dbc.Input(id="ricerca-freq", type="number",
                                           value=0.5, min=0, max=5, step=0.1),
@@ -178,7 +176,8 @@ def register_rent(app) -> None:
                     # ── 3-col: IMU + costi vendita + anno uscita ──────────
                     dbc.Row([
                         dbc.Col([
-                            dbc.Label("IMU (%/anno)", className="small fw-semibold"),
+                            dbc.Label(t("rent.lbl.imu", lang),
+                                      className="small fw-semibold"),
                             dbc.InputGroup([
                                 dbc.Input(id="imu-rate", type="number",
                                           value=default_imu, min=0, max=3, step=0.01),
@@ -187,7 +186,8 @@ def register_rent(app) -> None:
                             dbc.FormText(imu_text),
                         ], xs=12, md=4),
                         dbc.Col([
-                            dbc.Label("Costi vendita", className="small fw-semibold"),
+                            dbc.Label(t("rent.lbl.costi_vendita", lang),
+                                      className="small fw-semibold"),
                             dbc.InputGroup([
                                 dbc.Input(id="costo-vendita-pct", type="number",
                                           value=4.0, min=0, max=15, step=0.5),
@@ -195,7 +195,8 @@ def register_rent(app) -> None:
                             ], size="sm"),
                         ], xs=6, md=4),
                         dbc.Col([
-                            dbc.Label("Anno uscita", className="small fw-semibold"),
+                            dbc.Label(t("rent.lbl.anno_uscita", lang),
+                                      className="small fw-semibold"),
                             dbc.InputGroup([
                                 dbc.Input(id="anno-uscita", type="number",
                                           value=None,
@@ -211,13 +212,13 @@ def register_rent(app) -> None:
                         dbc.CardBody([
                             dbc.Row([
                                 dbc.Col(
-                                    html.Small("Crescita canone di locazione",
+                                    html.Small(t("rent.lbl.crescita_canone", lang),
                                                className="fw-semibold text-muted"),
                                 ),
                                 dbc.Col(
                                     dbc.Switch(
                                         id="canone-disallacciato", value=False,
-                                        label="Disallaccia dall'inflazione",
+                                        label=t("rent.lbl.disallaccia", lang),
                                         className="mb-0",
                                     ),
                                     className="col-auto",
@@ -225,7 +226,7 @@ def register_rent(app) -> None:
                             ], className="align-items-center mb-2"),
                             dbc.Row([
                                 dbc.Col([
-                                    dbc.Label("Crescita (%/anno)",
+                                    dbc.Label(t("rent.lbl.crescita_pct", lang),
                                               className="small"),
                                     dbc.InputGroup([
                                         dbc.Input(id="canone-growth-pct", type="number",
@@ -235,7 +236,7 @@ def register_rent(app) -> None:
                                     ]),
                                 ]),
                                 dbc.Col([
-                                    dbc.Label("Adeguamento ogni (anni)",
+                                    dbc.Label(t("rent.lbl.adeguamento", lang),
                                               className="small"),
                                     dbc.InputGroup([
                                         dbc.Input(id="canone-step-years", type="number",
@@ -307,6 +308,7 @@ def register_rent(app) -> None:
         Input("ricerca-costo",         "value"),
         Input("ricerca-freq",          "value"),
         Input("rent-store",            "data"),
+        Input("lang-store",         "data"),
     )
     def update_investment(
         affitto, regime, discount, inflaz,
@@ -315,7 +317,7 @@ def register_rent(app) -> None:
         anno_uscita,
         canone_disallacciato, canone_growth_pct, canone_step_years,
         ricerca_costo, ricerca_freq,
-        store,
+        store, lang,
     ):
         _empty = go.Figure().update_layout(
             paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
@@ -452,22 +454,22 @@ def register_rent(app) -> None:
                      + net_terminal / (1 + r_disc_m) ** n_months_T)
 
         # ── Chart 1: Waterfall ─────────────────────────────────────────────
-        wf_x = ["Affitto lordo", "Imposte", "Manutenzione str."]
+        wf_x = [t("rent.wf.affitto_lordo", lang), t("rent.wf.imposte", lang), t("rent.wf.manutenzione", lang)]
         wf_y = [affitto_lordo, -tax_mensile, -maint_ext_mens]
         wf_m = ["absolute", "relative", "relative"]
 
         if imu_mens > 0.01:
-            wf_x.append("IMU")
+            wf_x.append(t("rent.wf.imu", lang))
             wf_y.append(-imu_mens)
             wf_m.append("relative")
         if ricerca_mens > 0.01:
-            wf_x.append("Ricerca inq.")
+            wf_x.append(t("rent.wf.ricerca_inq", lang))
             wf_y.append(-ricerca_mens)
             wf_m.append("relative")
-        wf_x.append("Rata mutuo")
+        wf_x.append(t("rent.wf.rata_mutuo", lang))
         wf_y.append(-monthly_pmt_val)
         wf_m.append("relative")
-        wf_x.append("CF netto")
+        wf_x.append(t("rent.wf.cf_netto", lang))
         wf_y.append(net_cf_mens)
         wf_m.append("total")
 
@@ -481,7 +483,7 @@ def register_rent(app) -> None:
             texttemplate="%{y:,.0f} \u20ac", textposition="outside",
         ))
         waterfall_fig.update_layout(
-            title=f"Cashflow mensile (anno\u00a01) \u2014 Affitto lordo {fe(affitto_lordo, 0)}/mese",
+            title=t("rent.wf.title", lang).format(affitto=fe(affitto_lordo, 0)),
             height=400, width=500, autosize=False, margin=dict(t=50, b=40, l=50, r=20), showlegend=False,
         )
 
@@ -503,20 +505,20 @@ def register_rent(app) -> None:
             total_pnl.append(cum_cf + net_equity_yr)
 
         cum_fig = go.Figure()
-        cum_fig.add_trace(go.Scatter(x=years, y=cum_cfs_yr, name="CF operativi cumulati",
+        cum_fig.add_trace(go.Scatter(x=years, y=cum_cfs_yr, name=t("rent.cum.cf_operativi", lang),
                                      mode="lines", line=dict(color="#3b82f6", width=2)))
-        cum_fig.add_trace(go.Scatter(x=years, y=equity_gain, name="Guadagno netto equity",
+        cum_fig.add_trace(go.Scatter(x=years, y=equity_gain, name=t("rent.cum.equity_gain", lang),
                                      mode="lines", line=dict(color="#10b981", width=2)))
-        cum_fig.add_trace(go.Scatter(x=years, y=total_pnl, name="P&L totale (se venduto ora)",
+        cum_fig.add_trace(go.Scatter(x=years, y=total_pnl, name=t("rent.cum.pnl_totale", lang),
                                      mode="lines+markers", line=dict(color="#f59e0b", width=2.5), marker=dict(size=5)))
         cum_fig.add_hline(y=0, line_dash="dot",
-                          line_color="#94a3b8", annotation_text="Break-even")
+                          line_color="#94a3b8", annotation_text=t("rent.cum.breakeven", lang))
         if T != int(durata):
             cum_fig.add_vline(x=T, line_dash="dash", line_color="#ef4444",
-                              annotation_text=f"Uscita anno\u00a0{T}")
+                              annotation_text=t("rent.cum.uscita", lang).format(T=T))
         cum_fig.update_layout(
-            title=f"P&L cumulato \u2014 orizzonte {T} anni",
-            xaxis_title="Anno", yaxis_title="\u20ac", height=380,
+            title=t("rent.cum.title", lang).format(T=T),
+            xaxis_title=t("rent.cum.xaxis", lang), yaxis_title=t("rent.cum.yaxis", lang), height=380,
             margin=dict(t=50, b=40, l=60, r=20),
             legend=dict(orientation="h", yanchor="bottom",
                         y=1.02, xanchor="right", x=1),
@@ -539,10 +541,10 @@ def register_rent(app) -> None:
                                      fill="tozeroy", fillcolor="rgba(139,92,246,0.12)"))
         npv_fig.add_hline(y=0, line_dash="dot", line_color="#94a3b8")
         npv_fig.add_vline(x=inflaz_r * 100, line_dash="dash",
-                          annotation_text=f"Attuale {fp(inflaz_r)}")
+                          annotation_text=t("rent.npv.vline", lang).format(val=fp(inflaz_r)))
         npv_fig.update_layout(
-            title=f"NPV vs rivalutazione \u2014 sconto {fp(discount_r)}, orizzonte {T} anni",
-            xaxis_title="Rivalutazione annua (%)", yaxis_title="NPV (\u20ac)",
+            title=t("rent.npv.title", lang).format(disc=fp(discount_r), T=T),
+            xaxis_title=t("rent.npv.xaxis", lang), yaxis_title=t("rent.npv.yaxis", lang),
             height=380, margin=dict(t=50, b=40, l=60, r=20),
         )
 
@@ -588,10 +590,10 @@ def register_rent(app) -> None:
                                          fill="tozeroy", fillcolor="rgba(6,182,212,0.12)"))
         irr_fig.add_hline(y=0, line_dash="dot", line_color="#94a3b8")
         irr_fig.add_vline(x=affitto_lordo, line_dash="dash",
-                          annotation_text=f"Attuale {fe(affitto_lordo, 0)}")
+                          annotation_text=t("rent.irr_chart.vline", lang).format(val=fe(affitto_lordo, 0)))
         irr_fig.update_layout(
-            title=f"IRR al variare del canone \u2014 orizzonte {T} anni",
-            xaxis_title="Affitto lordo mensile (\u20ac)", yaxis_title="IRR annualizzato (%)",
+            title=t("rent.irr_chart.title", lang).format(T=T),
+            xaxis_title=t("rent.irr_chart.xaxis", lang), yaxis_title=t("rent.irr_chart.yaxis", lang),
             height=340, margin=dict(t=50, b=40, l=60, r=20),
         )
 
@@ -600,19 +602,19 @@ def register_rent(app) -> None:
             irr_vs_btp = irr_ann - _BTP_REF
             sign = "+" if irr_vs_btp >= 0 else ""
             irr_color = "#10b981" if irr_ann >= discount_r else "#ef4444"
-            irr_badge = f"{sign}{irr_vs_btp * 100:.1f}\u202fpp vs BTP 3.5%"
+            irr_badge = t("rent.hero.vs_btp", lang).format(sign=sign, pp=irr_vs_btp * 100)
             irr_display = f"{irr_ann * 100:.2f}%"
-            verdict = ("Investimento solido \u2714"
+            verdict = (t("rent.hero.verdict_ok", lang)
                        if irr_ann >= discount_r
-                       else "Rendimento sotto il tuo obiettivo \u2718")
+                       else t("rent.hero.verdict_ko", lang))
         else:
             irr_color = "#94a3b8"
             irr_badge = "n/d"
             irr_display = "n/d"
-            verdict = "IRR non calcolabile con questi parametri"
+            verdict = t("rent.hero.verdict_nd", lang)
 
         hero_irr = html.Div([
-            html.Div("IRR investimento", style={
+            html.Div(t("rent.hero.irr_label", lang), style={
                 "fontSize": "0.72rem", "color": "#64748b",
                 "textTransform": "uppercase", "letterSpacing": "0.07em",
                 "marginBottom": "4px",
@@ -630,9 +632,9 @@ def register_rent(app) -> None:
                 "fontWeight": "500", "marginTop": "6px",
             }),
             html.Div([
-                html.Span("Orizzonte:\u00a0", style={"color": "#94a3b8"}),
+                html.Span(t("rent.hero.orizzonte", lang), style={"color": "#94a3b8"}),
                 html.Span(f"{T} anni", className="fw-semibold"),
-                html.Span("\u00a0\u00b7\u00a0NPV:\u00a0",
+                html.Span(t("rent.hero.npv_label", lang),
                           style={"color": "#94a3b8"}),
                 html.Span(fe(npv_total), className="fw-semibold",
                           style={"color": "#10b981" if npv_total >= 0 else "#ef4444"}),
@@ -647,15 +649,15 @@ def register_rent(app) -> None:
         if underwater:
             alerts.append(dbc.Alert([
                 html.I(className="bi bi-exclamation-triangle-fill me-2"),
-                html.Strong(f"Equity negativa all'anno {T}: "),
-                (f"saldo residuo ({fe(remain_at_T)}) > ricavo di vendita "
-                 f"({fe(prop_at_T * (1 - sell_cost_r))}). "
-                 f"Perdita attesa: {fe(abs(net_terminal))}."),
+                html.Strong(t("rent.alert.equity_neg_title", lang).format(T=T)),
+                t("rent.alert.equity_neg_body", lang).format(
+                    saldo=fe(remain_at_T), ricavo=fe(prop_at_T * (1 - sell_cost_r)), perdita=fe(abs(net_terminal))
+                ),
             ], color="danger", className="mb-3 small"))
 
         sub_kpis = dbc.Row([
             dbc.Col(html.Div([
-                html.Div("CF netto/mese",
+                html.Div(t("rent.kpi.cf_netto_mese", lang),
                          style={"fontSize": "0.68rem", "color": "#64748b"}),
                 html.Div(f"{net_cf_mens:+,.0f}\u00a0\u20ac", style={
                     "fontSize": "1.25rem", "fontWeight": "700",
@@ -664,7 +666,7 @@ def register_rent(app) -> None:
             ], className="p-2 text-center rounded",
                 style={"background": "#f8fafc", "border": "1px solid #e2e8f0"})),
             dbc.Col(html.Div([
-                html.Div("Gross Yield", style={
+                html.Div(t("rent.kpi.gross_yield", lang), style={
                          "fontSize": "0.68rem", "color": "#64748b"}),
                 html.Div(fp(gross_yield), style={
                     "fontSize": "1.25rem", "fontWeight": "700", "color": "#3b82f6",
@@ -672,7 +674,7 @@ def register_rent(app) -> None:
             ], className="p-2 text-center rounded",
                 style={"background": "#f8fafc", "border": "1px solid #e2e8f0"})),
             dbc.Col(html.Div([
-                html.Div("Cap Rate", style={
+                html.Div(t("rent.kpi.cap_rate", lang), style={
                          "fontSize": "0.68rem", "color": "#64748b"}),
                 html.Div(fp(cap_rate), style={
                     "fontSize": "1.25rem", "fontWeight": "700", "color": "#8b5cf6",
@@ -682,27 +684,21 @@ def register_rent(app) -> None:
         ], className="mb-3 g-2")
 
         table_rows = [
-            ("Affitto lordo mensile",          fe(affitto_lordo, 2)),
-            ("Imposte sul canone",
-             f"\u2212 {fe(tax_mensile, 2)}"),
-            ("Manutenzione straord. mensile",
-             f"\u2212 {fe(maint_ext_mens, 2)}"),
-            ("Ricerca inquilino (mensil.)",
-             f"\u2212 {fe(ricerca_mens, 2)}"),
-            ("IMU mensile",                     f"\u2212 {fe(imu_mens, 2)}"),
-            ("Rata mutuo",
-             f"\u2212 {fe(monthly_pmt_val, 2)}"),
-            ("Cashflow netto mensile",
-             f"{'▲' if net_cf_mens >= 0 else '▼'} {fe(abs(net_cf_mens), 2)}"),
+            (t("rent.tbl.affitto_lordo", lang),  fe(affitto_lordo, 2)),
+            (t("rent.tbl.imposte", lang),       f"\u2212 {fe(tax_mensile, 2)}"),
+            (t("rent.tbl.manutenzione", lang),  f"\u2212 {fe(maint_ext_mens, 2)}"),
+            (t("rent.tbl.ricerca", lang),        f"\u2212 {fe(ricerca_mens, 2)}"),
+            (t("rent.tbl.imu", lang),            f"\u2212 {fe(imu_mens, 2)}"),
+            (t("rent.tbl.rata", lang),           f"\u2212 {fe(monthly_pmt_val, 2)}"),
+            (t("rent.tbl.cf_netto", lang),       f"{'▲' if net_cf_mens >= 0 else '▼'} {fe(abs(net_cf_mens), 2)}"),
             ("\u2500", "\u2500"),
-            ("Gross Rental Yield",              fp(gross_yield)),
-            ("Cap Rate (pre-tax NOI/val.)",     fp(cap_rate)),
-            ("Net Yield (post-tax NOI/val.)",   fp(net_yield)),
-            ("Cash-on-Cash Return",             fp(coc_return)),
-            (f"IRR (orizzonte {T} anni)",       irr_display),
-            ("NPV totale",                      fe(npv_total)),
-            ("Canone break-even",
-             fe(break_even_rent, 0) + " \u20ac/mese"),
+            (t("rent.tbl.gross_yield", lang), fp(gross_yield)),
+            (t("rent.tbl.cap_rate", lang),    fp(cap_rate)),
+            (t("rent.tbl.net_yield", lang),   fp(net_yield)),
+            (t("rent.tbl.coc", lang),         fp(coc_return)),
+            (t("rent.tbl.irr", lang).format(T=T), irr_display),
+            (t("rent.tbl.npv", lang),         fe(npv_total)),
+            (t("rent.tbl.breakeven", lang),   fe(break_even_rent, 0) + " " + t("rent.tbl.euro_mese", lang)),
         ]
         detail_table = dbc.Table(
             html.Tbody([
