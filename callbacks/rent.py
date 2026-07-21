@@ -85,10 +85,14 @@ def register_rent(app) -> None:
                             dbc.Select(
                                 id="regime-tassazione",
                                 options=[
-                                    {"label": t("rent.opt.cc10", lang), "value": "cc10"},
-                                    {"label": t("rent.opt.cs21", lang), "value": "cs21"},
-                                    {"label": t("rent.opt.irpef35", lang), "value": "irpef35"},
-                                    {"label": t("rent.opt.irpef43", lang), "value": "irpef43"},
+                                    {"label": t("rent.opt.cc10", lang),
+                                     "value": "cc10"},
+                                    {"label": t("rent.opt.cs21", lang),
+                                     "value": "cs21"},
+                                    {"label": t("rent.opt.irpef35",
+                                                lang), "value": "irpef35"},
+                                    {"label": t("rent.opt.irpef43",
+                                                lang), "value": "irpef43"},
                                 ],
                                 value="cc10", className="form-select",
                             ),
@@ -104,11 +108,15 @@ def register_rent(app) -> None:
                             ]),
                             dbc.Tooltip(
                                 html.Div([
-                                    html.P(t("rent.tt.discount.title", lang), className="fw-semibold mb-1"),
+                                    html.P(t("rent.tt.discount.title", lang),
+                                           className="fw-semibold mb-1"),
                                     html.Ul([
-                                        html.Li(t("rent.tt.discount.li1", lang)),
-                                        html.Li(t("rent.tt.discount.li2", lang)),
-                                        html.Li(t("rent.tt.discount.li3", lang)),
+                                        html.Li(
+                                            t("rent.tt.discount.li1", lang)),
+                                        html.Li(
+                                            t("rent.tt.discount.li2", lang)),
+                                        html.Li(
+                                            t("rent.tt.discount.li3", lang)),
                                     ], className="mb-1 ps-3 small"),
                                     html.P(t("rent.tt.discount.footer", lang),
                                            className="mb-0 small"),
@@ -149,7 +157,7 @@ def register_rent(app) -> None:
                                       className="small fw-semibold"),
                             dbc.InputGroup([
                                 dbc.Input(id="manutenzione-costo", type="number",
-                                          value=3000, min=0, step=500),
+                                          value=3000, min=0, step=50),
                                 dbc.InputGroupText("\u20ac"),
                             ], size="sm"),
                         ], xs=6, md=3),
@@ -158,7 +166,7 @@ def register_rent(app) -> None:
                                       className="small fw-semibold"),
                             dbc.InputGroup([
                                 dbc.Input(id="ricerca-costo", type="number",
-                                          value=500, min=0, step=100),
+                                          value=500, min=0, step=10),
                                 dbc.InputGroupText("\u20ac"),
                             ], size="sm"),
                         ], xs=6, md=3),
@@ -454,7 +462,8 @@ def register_rent(app) -> None:
                      + net_terminal / (1 + r_disc_m) ** n_months_T)
 
         # ── Chart 1: Waterfall ─────────────────────────────────────────────
-        wf_x = [t("rent.wf.affitto_lordo", lang), t("rent.wf.imposte", lang), t("rent.wf.manutenzione", lang)]
+        wf_x = [t("rent.wf.affitto_lordo", lang), t(
+            "rent.wf.imposte", lang), t("rent.wf.manutenzione", lang)]
         wf_y = [affitto_lordo, -tax_mensile, -maint_ext_mens]
         wf_m = ["absolute", "relative", "relative"]
 
@@ -483,7 +492,8 @@ def register_rent(app) -> None:
             texttemplate="%{y:,.0f} \u20ac", textposition="outside",
         ))
         waterfall_fig.update_layout(
-            title=t("rent.wf.title", lang).format(affitto=fe(affitto_lordo, 0)),
+            title=t("rent.wf.title", lang).format(
+                affitto=fe(affitto_lordo, 0)),
             height=400, width=500, autosize=False, margin=dict(t=50, b=40, l=50, r=20), showlegend=False,
         )
 
@@ -602,7 +612,8 @@ def register_rent(app) -> None:
             irr_vs_btp = irr_ann - _BTP_REF
             sign = "+" if irr_vs_btp >= 0 else ""
             irr_color = "#10b981" if irr_ann >= discount_r else "#ef4444"
-            irr_badge = t("rent.hero.vs_btp", lang).format(sign=sign, pp=irr_vs_btp * 100)
+            irr_badge = t("rent.hero.vs_btp", lang).format(
+                sign=sign, pp=irr_vs_btp * 100)
             irr_display = f"{irr_ann * 100:.2f}%"
             verdict = (t("rent.hero.verdict_ok", lang)
                        if irr_ann >= discount_r
@@ -632,7 +643,8 @@ def register_rent(app) -> None:
                 "fontWeight": "500", "marginTop": "6px",
             }),
             html.Div([
-                html.Span(t("rent.hero.orizzonte", lang), style={"color": "#94a3b8"}),
+                html.Span(t("rent.hero.orizzonte", lang),
+                          style={"color": "#94a3b8"}),
                 html.Span(f"{T} anni", className="fw-semibold"),
                 html.Span(t("rent.hero.npv_label", lang),
                           style={"color": "#94a3b8"}),
@@ -649,7 +661,8 @@ def register_rent(app) -> None:
         if underwater:
             alerts.append(dbc.Alert([
                 html.I(className="bi bi-exclamation-triangle-fill me-2"),
-                html.Strong(t("rent.alert.equity_neg_title", lang).format(T=T)),
+                html.Strong(
+                    t("rent.alert.equity_neg_title", lang).format(T=T)),
                 t("rent.alert.equity_neg_body", lang).format(
                     saldo=fe(remain_at_T), ricavo=fe(prop_at_T * (1 - sell_cost_r)), perdita=fe(abs(net_terminal))
                 ),
@@ -685,12 +698,17 @@ def register_rent(app) -> None:
 
         table_rows = [
             (t("rent.tbl.affitto_lordo", lang),  fe(affitto_lordo, 2)),
-            (t("rent.tbl.imposte", lang),       f"\u2212 {fe(tax_mensile, 2)}"),
-            (t("rent.tbl.manutenzione", lang),  f"\u2212 {fe(maint_ext_mens, 2)}"),
-            (t("rent.tbl.ricerca", lang),        f"\u2212 {fe(ricerca_mens, 2)}"),
+            (t("rent.tbl.imposte", lang),
+             f"\u2212 {fe(tax_mensile, 2)}"),
+            (t("rent.tbl.manutenzione", lang),
+             f"\u2212 {fe(maint_ext_mens, 2)}"),
+            (t("rent.tbl.ricerca", lang),
+             f"\u2212 {fe(ricerca_mens, 2)}"),
             (t("rent.tbl.imu", lang),            f"\u2212 {fe(imu_mens, 2)}"),
-            (t("rent.tbl.rata", lang),           f"\u2212 {fe(monthly_pmt_val, 2)}"),
-            (t("rent.tbl.cf_netto", lang),       f"{'▲' if net_cf_mens >= 0 else '▼'} {fe(abs(net_cf_mens), 2)}"),
+            (t("rent.tbl.rata", lang),
+             f"\u2212 {fe(monthly_pmt_val, 2)}"),
+            (t("rent.tbl.cf_netto", lang),
+             f"{'▲' if net_cf_mens >= 0 else '▼'} {fe(abs(net_cf_mens), 2)}"),
             ("\u2500", "\u2500"),
             (t("rent.tbl.gross_yield", lang), fp(gross_yield)),
             (t("rent.tbl.cap_rate", lang),    fp(cap_rate)),
@@ -698,7 +716,8 @@ def register_rent(app) -> None:
             (t("rent.tbl.coc", lang),         fp(coc_return)),
             (t("rent.tbl.irr", lang).format(T=T), irr_display),
             (t("rent.tbl.npv", lang),         fe(npv_total)),
-            (t("rent.tbl.breakeven", lang),   fe(break_even_rent, 0) + " " + t("rent.tbl.euro_mese", lang)),
+            (t("rent.tbl.breakeven", lang),   fe(break_even_rent, 0) +
+             " " + t("rent.tbl.euro_mese", lang)),
         ]
         detail_table = dbc.Table(
             html.Tbody([

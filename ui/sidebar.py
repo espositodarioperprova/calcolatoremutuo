@@ -11,49 +11,54 @@ def build_sidebar() -> dbc.Card:
         [
             dbc.CardHeader(
                 html.H5(
-                    [html.I(className="bi bi-gear-fill me-2"), html.Span(id="sb-hdr", children="Parametri")],
+                    [html.I(className="bi bi-gear-fill me-2"),
+                     html.Span(id="sb-hdr", children="Parametri")],
                     className="mb-0 fw-bold",
                 )
             ),
             dbc.CardBody([
-                dbc.Label("Prezzo immobile (€)", id="sb-lbl-offerta", className="fw-semibold"),
+                dbc.Label("Prezzo immobile (€)", id="sb-lbl-offerta",
+                          className="fw-semibold"),
                 dbc.Input(
                     id="offerta", type="number",
-                    value=100_000, min=10_000, step=5_000, className="mb-1",
+                    value=100_000, min=1_000, step=500, className="mb-1",
                 ),
                 dbc.FormText(
                     "Prezzo concordato con il venditore. Usa il cursore o digita il valore.",
                     id="sb-ft-offerta", className="mb-1"),
                 dcc.Slider(
                     id="offerta-slider", min=50_000, max=1_000_000,
-                    step=10_000, value=100_000, marks=None,
+                    step=1_000, value=100_000, marks=None,
                     tooltip={"placement": "bottom", "always_visible": False},
                     className="mb-2",
                 ),
                 html.Hr(className="my-2"),
 
-                dbc.Label("Anticipo (€)", id="sb-lbl-anticipo", className="fw-semibold"),
+                dbc.Label("Anticipo (€)", id="sb-lbl-anticipo",
+                          className="fw-semibold"),
                 dbc.Input(
                     id="anticipo", type="number",
-                    value=20_000, min=0, step=1_000, className="mb-1",
+                    value=20_000, min=0, step=100, className="mb-1",
                 ),
                 html.Div(id="ltv-display", className="text-muted small mb-2"),
                 html.Hr(className="my-2"),
 
                 dbc.Row([
                     dbc.Col([
-                        dbc.Label("Durata (anni)", id="sb-lbl-durata", className="fw-semibold"),
+                        dbc.Label("Durata (anni)", id="sb-lbl-durata",
+                                  className="fw-semibold"),
                         dbc.Input(
                             id="durata", type="number",
                             value=30, min=5, max=40, step=1,
                         ),
                     ]),
                     dbc.Col([
-                        dbc.Label("Tasso annuo", id="sb-lbl-tasso", className="fw-semibold"),
+                        dbc.Label("Tasso annuo", id="sb-lbl-tasso",
+                                  className="fw-semibold"),
                         dbc.InputGroup([
                             dbc.Input(
                                 id="tasso", type="number",
-                                value=3.20, min=0.10, max=20, step=0.05,
+                                value=3.20, min=0.10, max=20, step=0.01,
                             ),
                             dbc.InputGroupText("%"),
                         ]),
@@ -61,7 +66,8 @@ def build_sidebar() -> dbc.Card:
                 ], className="mb-2"),
                 html.Hr(className="my-2"),
 
-                dbc.Label("Tipo di acquisto", id="sb-lbl-tipo", className="fw-semibold"),
+                dbc.Label("Tipo di acquisto", id="sb-lbl-tipo",
+                          className="fw-semibold"),
                 dbc.RadioItems(
                     id="tipo",
                     options=[
@@ -86,7 +92,8 @@ def build_sidebar() -> dbc.Card:
                     id="rendita", type="number",
                     value=206.58, min=0, step=0.01, className="mb-1",
                 ),
-                dbc.FormText("Dalla visura catastale dell'immobile", id="sb-ft-rendita"),
+                dbc.FormText("Dalla visura catastale dell'immobile",
+                             id="sb-ft-rendita"),
                 html.Hr(className="my-2"),
 
                 dbc.Checkbox(
@@ -104,7 +111,8 @@ def build_sidebar() -> dbc.Card:
                 ),
                 dbc.Collapse(
                     dbc.Card(dbc.CardBody([
-                        dbc.Label("Oneri notaio per l'acquisto (€)", id="sb-lbl-notaio"),
+                        dbc.Label("Oneri notaio per l'acquisto (€)",
+                                  id="sb-lbl-notaio"),
                         dbc.Input(id="notaio", type="number",
                                   value=2000, min=0, className="mb-1"),
                         dbc.FormText(
@@ -166,7 +174,8 @@ def build_sidebar() -> dbc.Card:
                         dbc.FormText(
                             "Commissione broker/mediatore creditizio sul capitale erogato",
                             id="sb-ft-kiron", className="mb-2"),
-                        dbc.Label("% agenzia immobiliare", id="sb-lbl-med-pct"),
+                        dbc.Label("% agenzia immobiliare",
+                                  id="sb-lbl-med-pct"),
                         dbc.InputGroup([
                             dbc.Input(id="med-pct", type="number",
                                       value=4.0, min=0, max=10, step=0.1),

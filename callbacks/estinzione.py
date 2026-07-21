@@ -51,7 +51,8 @@ def register_estinzione(app) -> None:
             return dbc.Alert(
                 [
                     html.I(className="bi bi-info-circle me-2"),
-                    t("estinzione.alert.range", lang).format(max=durata - 1, durata=durata),
+                    t("estinzione.alert.range", lang).format(
+                        max=durata - 1, durata=durata),
                 ],
                 color="info", className="mt-3",
             )
@@ -164,7 +165,8 @@ def register_estinzione(app) -> None:
             cum_fig.add_vline(x=crossover_yr, line_dash="dash", line_color="#f59e0b",
                               annotation_text=t("estinzione.cum.crossover", lang).format(yr=crossover_yr))
         cum_fig.update_layout(
-            title=t("estinzione.cum.title", lang).format(X=X, rate=fp(r_alt_v)),
+            title=t("estinzione.cum.title", lang).format(
+                X=X, rate=fp(r_alt_v)),
             xaxis_title=t("estinzione.cum.xaxis", lang).format(X=X),
             yaxis_title=t("estinzione.cum.yaxis", lang),
             height=360, margin=dict(t=50, b=40, l=60, r=20),
@@ -204,11 +206,14 @@ def register_estinzione(app) -> None:
 
         # ── KPIs ──────────────────────────────────────────────────────────
         verdict_color = "success" if extinguish_better else "primary"
-        det_note = t("estinzione.kpi.det_note", lang) if (apply_det and prima) else t("estinzione.kpi.lordo", lang)
+        det_note = t("estinzione.kpi.det_note", lang) if (
+            apply_det and prima) else t("estinzione.kpi.lordo", lang)
         if extinguish_better:
-            verdict_txt = t("estinzione.verdict.conviene", lang).format(eff_rate=fp(eff_rate), r_alt=fp(r_alt_v))
+            verdict_txt = t("estinzione.verdict.conviene", lang).format(
+                eff_rate=fp(eff_rate), r_alt=fp(r_alt_v))
         else:
-            verdict_txt = t("estinzione.verdict.investi", lang).format(eff_rate=fp(eff_rate), r_alt=fp(r_alt_v))
+            verdict_txt = t("estinzione.verdict.investi", lang).format(
+                eff_rate=fp(eff_rate), r_alt=fp(r_alt_v))
 
         kpis = dbc.Row([
             dbc.Col(html.Div([
