@@ -24,7 +24,7 @@ def build_sidebar() -> dbc.Card:
                     value=100_000, min=1_000, step=500, className="mb-1",
                 ),
                 dbc.FormText(
-                    "Prezzo concordato con il venditore. Usa il cursore o digita il valore.",
+                    "Prezzo concordato. Usa il cursore o digita il valore.",
                     id="sb-ft-offerta", className="mb-1"),
                 dcc.Slider(
                     id="offerta-slider", min=50_000, max=1_000_000,
